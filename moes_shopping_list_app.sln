@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36202.13 d17.14
+VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "moes_shopping_list_app", "moes_shopping_list_app\moes_shopping_list_app.csproj", "{05E906F1-75A7-488E-9B83-EC81D6BB23F3}"
 EndProject
@@ -13,6 +13,7 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{05E906F1-75A7-488E-9B83-EC81D6BB23F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05E906F1-75A7-488E-9B83-EC81D6BB23F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05E906F1-75A7-488E-9B83-EC81D6BB23F3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{05E906F1-75A7-488E-9B83-EC81D6BB23F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05E906F1-75A7-488E-9B83-EC81D6BB23F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

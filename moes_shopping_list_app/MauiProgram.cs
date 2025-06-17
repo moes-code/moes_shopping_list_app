@@ -29,9 +29,13 @@ namespace moes_shopping_list_app
             builder.Services.AddSingleton<ShoppingListDbContext>(provider =>
             {
                 // Combining the application data directory path with the database file name to create the full path
-                string dbPath = Path.Combine(FileSystem.AppDataDirectory, "shoppinglist.db");
-                // Returning a new instance of ShoppingListDbContext initialized with the database path
-                return new ShoppingListDbContext(dbPath);
+                string dbPath = Path.Combine(FileSystem.AppDataDirectory, "shopping_list.db");
+                // Creating a new instance of ShoppingListDbContext initialized with the database path
+                var dbContext = new ShoppingListDbContext(dbPath);
+                // Call CreateTable to ensure the ShoppingItems table is created
+                dbContext.CreateTable();
+                // Return the initialized dbContext
+                return dbContext;
             });
 
             // Configuring fonts for the application to enhance UI appearance

@@ -1,12 +1,80 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="moes_shopping_list_app.Views.MainPage"
-             Title="MainPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:Class="moes_shopping_list_app.Views.MainPage" >
+    
+    <!-- Define the title view for the Shell -->
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Center" VerticalOptions="Center">
+            <Label Text="Shopping List"
+                   FontSize="28"
+                   TextColor="White"
+                   VerticalTextAlignment="Center" />
+        </Grid>
+    </Shell.TitleView>
+
+    <!-- Main grid layout for the content -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- CollectionView for displaying shopping items in the first row -->
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding ShoppingItems}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="10" Margin="10,10,10,5" StrokeShape="RoundRectangle 5" Stroke="{StaticResource Primary}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Label Text="{Binding Name}"
+                                   VerticalOptions="Center"
+                                   Margin="10,0,0,0"
+                                   Grid.Column="0" />
+                            <Label Text="{Binding Quantity}" 
+                                   VerticalOptions="Center"
+                                   Margin="0,0,40,0"
+                                   Grid.Column="1" />
+                            <Button Text="Edit"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateShoppingItemCommand}"
+                                    CommandParameter="{Binding .}" 
+                                    WidthRequest="80"
+                                    Grid.Column="2" />
+                            <Button Text="Delete"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteShoppingItemCommand}"
+                                    CommandParameter="{Binding Id}"
+                                    BackgroundColor="{StaticResource Fifth}"
+                                    WidthRequest="80"
+                                    Margin="15,0,5,0"
+                                    Grid.Column="3" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Stack layout for adding new items in the second row -->
+        <StackLayout Grid.Row="1" Padding="20" Orientation="Horizontal" HorizontalOptions="Fill" VerticalOptions="Center" BackgroundColor="{StaticResource Primary}">
+            <Entry Placeholder="Item Name"
+                   Text="{Binding NewItemName}" 
+                   WidthRequest="200"
+                   HorizontalTextAlignment="Center" />
+            <Entry Text="{Binding NewItemQuantity}"
+                   Keyboard="Numeric" 
+                   WidthRequest="50"
+                   HorizontalTextAlignment="Center" />
+            <Button Text="Add"
+                    Command="{Binding AddShoppingItemCommand}"
+                    BackgroundColor="{StaticResource Third}"
+                    TextColor="Black"
+                    WidthRequest="100"
+                    Margin="10,0,0,0" />
+        </StackLayout>
+    </Grid>
 </ContentPage>
