@@ -1,7 +1,5 @@
-﻿// Define a namespace for the shopping list application models
-namespace moes_shopping_list_app.Models
+﻿namespace moes_shopping_list_app.Models
 {
-    // Define a class to represent an item in the shopping list
     public class ShoppingItem
     {
         // Property to store the unique identifier for the shopping item

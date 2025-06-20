@@ -1,10 +1,8 @@
-﻿// Import necessary namespaces for Android application development
-using Android.App; // Provides classes for creating Android applications
-using Android.Content.PM; // Contains classes for managing application packages and permissions
-using Android.OS; // Provides classes for interacting with the Android operating system
-using Android.Views; // Contains classes for handling user interface elements
+﻿using Android.App;
+using Android.Content.PM;
+using Android.OS;
+using Android.Views;
 
-// Define the namespace for the application
 namespace moes_shopping_list_app
 {
     // Define the MainActivity class, which is the entry point of the application

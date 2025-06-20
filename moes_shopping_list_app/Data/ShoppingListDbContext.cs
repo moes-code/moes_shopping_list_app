@@ -1,12 +1,8 @@
-﻿// Import the Microsoft.Data.Sqlite namespace to use SQLite database functionality.
-using Microsoft.Data.Sqlite;
-// Import the Dapper namespace to use Dapper's database querying capabilities.
+﻿using Microsoft.Data.Sqlite;
 using Dapper;
 
-// Define a namespace for the shopping list application's data access layer.
 namespace moes_shopping_list_app.Data
 {
-    // Represents a database context for the shopping list application.
     public class ShoppingListDbContext
     {
         // Private field to store the path to the SQLite database file.

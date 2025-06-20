@@ -1,14 +1,9 @@
-﻿// Import the Dapper library for database operations
-using Dapper;
-// Import the Data namespace for database context
+﻿using Dapper;
 using moes_shopping_list_app.Data;
-// Import the Models namespace for ShoppingItem model
 using moes_shopping_list_app.Models;
 
-// Define the namespace for the repositories
 namespace moes_shopping_list_app.Repositories
 {
-    // Define a public class for ShoppingItem repository
     public class ShoppingItemRepository
     {
         // Private readonly field to store the database context
