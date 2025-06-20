@@ -8,79 +8,90 @@ namespace moes_shopping_list_app.ViewModels
 {
     public partial class ShoppingListViewModel : ObservableObject
     {
+        // Private field to hold the repository instance for data operations
         private readonly ShoppingItemRepository _repository;
 
-        // Wenn du das CommunityToolkit verwendest geht das auch für Properties.
-        // Gem. Concention werden private Felder mit einem Unterstrich "_" am Anfang benannt.
-        // Der Code-Generator von CommunityToolkit erstellt automatisch die Property für dich.
+        // Observable property for the collection of shopping items
         [ObservableProperty]
         private ObservableCollection<ShoppingItem> _shoppingItems = [];
 
+        // Observable property for the name of the new shopping item
         [ObservableProperty]
         private string _newItemName = string.Empty;
 
+        // Observable property for the quantity of the new shopping item
         [ObservableProperty]
         private int _newItemQuantity = 1;
 
+        // Constructor that initializes the ViewModel with a repository and loads existing shopping items
         public ShoppingListViewModel(ShoppingItemRepository repository)
         {
-            _repository = repository; 
-            LoadShoppingItemsCommand.Execute(null); 
+            _repository = repository; // Assigning the repository to the private field
+            LoadShoppingItemsCommand.Execute(null); // Executing the command to load shopping items
         }
 
-
-
+        // Command to load shopping items asynchronously
         [RelayCommand]
         private async Task LoadShoppingItems()
         {
+            // Fetching all shopping items from the repository
             var items = await _repository.GetAllShoppingItems();
-
-
-            // Simplified collection initialization
-            ShoppingItems = [.. items];
+            // Updating the ObservableCollection with the fetched items
+            new ObservableCollection<ShoppingItem>(items);
         }
 
+        // Command to add a new shopping item asynchronously
         [RelayCommand]
         private async Task AddShoppingItem()
         {
+            // Validating the new item name and quantity
             if (string.IsNullOrWhiteSpace(NewItemName) || NewItemQuantity <= 0)
             {
-                // Hier könntest du eine Fehlermeldung anzeigen, wenn die Eingaben ungültig sind
-                return;
+                // ToDo: Implement error message
+                return; // Exiting the method if validation fails
             }
 
-
+            // Creating a new shopping item with the provided name and quantity
             var newItem = new ShoppingItem
             {
                 Name = NewItemName,
                 Quantity = NewItemQuantity
             };
 
+            // Adding the new item to the repository
             await _repository.AddShoppingItem(newItem);
-
+            // Reloading the shopping items to reflect the changes
             await LoadShoppingItems();
 
+            // Resetting the input fields for the new item
             NewItemName = string.Empty;
             NewItemQuantity = 1;
         }
 
+        // Command to update an existing shopping item asynchronously
         [RelayCommand]
         private async Task UpdateShoppingItem(ShoppingItem item)
         {
-            // Arbeite lieber mit Guard Clauses, um sicherzustellen, dass die Eingaben gültig sind
-            // Als neues C# feature kann auch "is" oder "is not" verwendet werden, um den Typ zu prüfen
-
+            // Checking if the item is null
             if (item is null)
-                return;
+            {
+                // ToDo: Implement error message
+                return; // Exiting the method if the item is null
+            }
 
+            // Updating the item in the repository
             await _repository.UpdateShoppingItem(item);
+            // Reloading the shopping items to reflect the changes
             await LoadShoppingItems();
         }
 
+        // Command to delete a shopping item by its ID asynchronously
         [RelayCommand]
         private async Task DeleteShoppingItem(int id)
         {
+            // Deleting the item from the repository using its ID
             await _repository.DeleteShoppingItem(id);
+            // Reloading the shopping items to reflect the changes
             await LoadShoppingItems();
         }
     }
