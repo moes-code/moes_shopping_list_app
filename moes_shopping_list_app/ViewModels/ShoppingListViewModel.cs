@@ -36,12 +36,7 @@ namespace moes_shopping_list_app.ViewModels
         {
             // Fetching all shopping items from the repository
             var items = await _repository.GetAllShoppingItems();
-            // Updating the ObservableCollection with the fetched items
-            ShoppingItems.Clear(); // Clear existing items
-            foreach (var item in items)
-            {
-                ShoppingItems.Add(item); // Add each fetched item to the collection
-            }
+            ShoppingItems = [.. items]; // Assigning the fetched items to the observable collection
         }
 
         // Command to add a new shopping item asynchronously
