@@ -1,10 +1,9 @@
-// Importing the ShoppingListViewModel class from the ViewModels namespace
+// Importing the necessary namespace for view models in the application
 using moes_shopping_list_app.ViewModels;
 
-// Declaring the namespace for the Views in the application
 namespace moes_shopping_list_app.Views
 {
-    // Defining a partial class named MainPage that inherits from ContentPage
+    // Partial class definition for the MainPage, inheriting from ContentPage
     public partial class MainPage : ContentPage
     {
         // Constructor for the MainPage class that takes a ShoppingListViewModel as a parameter
@@ -15,6 +14,19 @@ namespace moes_shopping_list_app.Views
 
             // Sets the BindingContext of the page to the provided view model
             BindingContext = viewModel;
+        }
+
+        // Override method that is called when the page appears
+        protected override async void OnAppearing()
+        {
+            // Calls the base class implementation of OnAppearing
+            base.OnAppearing();
+            // Checks if the BindingContext is of type ShoppingListViewModel
+            if (BindingContext is ShoppingListViewModel viewModel)
+            {
+                // Executes the LoadShoppingItemsCommand to load shopping items asynchronously
+                await viewModel.LoadShoppingItemsCommand.ExecuteAsync(null);
+            }
         }
     }
 }

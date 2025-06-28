@@ -13,7 +13,7 @@
         </Grid>
     </Shell.TitleView>
 
-    <!-- Main grid layout for the content -->
+    <!-- Main grid layout for the content of the page -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -42,7 +42,7 @@
                                    Margin="0,0,40,0"
                                    Grid.Column="1" />
                             <Button Text="Edit"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateShoppingItemCommand}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditShoppingItemCommand}"
                                     CommandParameter="{Binding .}" 
                                     WidthRequest="80"
                                     Grid.Column="2" />

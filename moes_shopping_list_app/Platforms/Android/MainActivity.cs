@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿// Importing necessary namespaces for Android application development
+using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;

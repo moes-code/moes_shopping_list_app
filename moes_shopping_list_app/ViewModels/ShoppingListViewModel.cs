@@ -1,11 +1,14 @@
+// Importing necessary namespaces for collections, MVVM components, models, repositories, and views
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using moes_shopping_list_app.Models;
 using moes_shopping_list_app.Repositories;
+using moes_shopping_list_app.Views;
 
 namespace moes_shopping_list_app.ViewModels
 {
+    // ViewModel for managing the shopping list, inheriting from ObservableObject for property change notifications
     public partial class ShoppingListViewModel : ObservableObject
     {
         // Private field to hold the repository instance for data operations
@@ -13,7 +16,7 @@ namespace moes_shopping_list_app.ViewModels
 
         // Observable property for the collection of shopping items
         [ObservableProperty]
-        private ObservableCollection<ShoppingItem> _shoppingItems = [];
+        private ObservableCollection<ShoppingItem> _shoppingItems = new ObservableCollection<ShoppingItem>();
 
         // Observable property for the name of the new shopping item
         [ObservableProperty]
@@ -30,13 +33,19 @@ namespace moes_shopping_list_app.ViewModels
             LoadShoppingItemsCommand.Execute(null); // Executing the command to load shopping items
         }
 
+        // Method to retrieve a shopping item by its ID
+        public async Task<ShoppingItem?> GetItemById(int itemId)
+        {
+            return await _repository.GetItemById(itemId); // Fetching the item from the repository
+        }
+
         // Command to load shopping items asynchronously
         [RelayCommand]
         private async Task LoadShoppingItems()
         {
             // Fetching all shopping items from the repository
             var items = await _repository.GetAllShoppingItems();
-            ShoppingItems = [.. items]; // Assigning the fetched items to the observable collection
+            ShoppingItems = new ObservableCollection<ShoppingItem>(items); // Assigning the fetched items to the observable collection
         }
 
         // Command to add a new shopping item asynchronously
@@ -67,9 +76,22 @@ namespace moes_shopping_list_app.ViewModels
             NewItemQuantity = 1;
         }
 
+        // Command to edit an existing shopping item
+        [RelayCommand]
+        public async Task EditShoppingItem(ShoppingItem item)
+        {
+            // Checking if the item is null
+            if (item is not null)
+            {
+                var editItemViewModel = new EditItemViewModel(item, this); // Creating an instance of the EditItemViewModel
+                // Navigating to the EditItemPage with the item's ID as a parameter
+                await Shell.Current.GoToAsync($"{nameof(EditItemPage)}?ItemId={item.Id}");
+            }
+        }
+
         // Command to update an existing shopping item asynchronously
         [RelayCommand]
-        private async Task UpdateShoppingItem(ShoppingItem item)
+        public async Task UpdateShoppingItem(ShoppingItem item)
         {
             // Checking if the item is null
             if (item is null)
