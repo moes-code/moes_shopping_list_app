@@ -25,8 +25,9 @@
         <Border Margin="0" Padding="0" StrokeShape="RoundRectangle 10" Stroke="{StaticResource Primary}">
             <Entry Text="{Binding Item.Quantity}"
                    FontSize="22"
+                   Keyboard="Numeric"
                    HorizontalTextAlignment="Center"
-                   WidthRequest="130" />
+                   WidthRequest="100" />
         </Border>
 
         <!-- Stack layout for action buttons -->
@@ -40,6 +41,7 @@
             <Button Text="Cancel"
                     FontSize="18"
                     Command="{Binding CancelCommand}"
+                    TextColor="White"
                     BackgroundColor="{StaticResource Fifth}"
                     HeightRequest="50" />
         </StackLayout>
