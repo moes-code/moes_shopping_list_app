@@ -3,11 +3,45 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="moes_shopping_list_app.Views.EditItemPage">
 
-    <StackLayout Padding="20">
-        <Label Text="Edit Shopping Item" FontSize="24" HorizontalOptions="Center" />
-        <Entry Placeholder="Item Name" Text="{Binding Item.Name}" />
-        <Entry Text="{Binding Item.Quantity}" Keyboard="Numeric" />
-        <Button Text="Save" Command="{Binding SaveItemCommand}" />
-        <Button Text="Cancel" Command="{Binding CancelCommand}" />
+    <!-- Define the title view for the Shell -->
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Center" VerticalOptions="Center">
+            <Label Text="Edit Item"
+                   FontSize="28"
+                   TextColor="White"
+                   VerticalTextAlignment="Center"
+                   Margin="0,0,60,0" />
+        </Grid>
+    </Shell.TitleView>
+
+    <!-- Main stack layout for the content of the page -->
+    <StackLayout Padding="20" Spacing="20">
+        <Border Margin="0,20,0,0" Padding="0" StrokeShape="RoundRectangle 10" Stroke="{StaticResource Primary}">
+            <Entry Text="{Binding Item.Name}"
+                   FontSize="22"
+                   HorizontalTextAlignment="Center"
+                   WidthRequest="330" />
+        </Border>
+        <Border Margin="0" Padding="0" StrokeShape="RoundRectangle 10" Stroke="{StaticResource Primary}">
+            <Entry Text="{Binding Item.Quantity}"
+                   FontSize="22"
+                   HorizontalTextAlignment="Center"
+                   WidthRequest="130" />
+        </Border>
+
+        <!-- Stack layout for action buttons -->
+        <StackLayout Margin="0,20,0,0" Spacing="25">
+            <Button Text="Save"
+                    FontSize="18"
+                    Command="{Binding SaveItemCommand}"
+                    TextColor="Black"
+                    BackgroundColor="{StaticResource Third}"
+                    HeightRequest="50" />
+            <Button Text="Cancel"
+                    FontSize="18"
+                    Command="{Binding CancelCommand}"
+                    BackgroundColor="{StaticResource Fifth}"
+                    HeightRequest="50" />
+        </StackLayout>
     </StackLayout>
 </ContentPage>
