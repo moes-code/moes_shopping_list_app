@@ -55,7 +55,13 @@ namespace moes_shopping_list_app.ViewModels
             // Validating the new item name and quantity
             if (string.IsNullOrWhiteSpace(NewItemName) || NewItemQuantity <= 0)
             {
-                // ToDo: Implement error message
+                // Get the current page from the application context
+                var currentPage = Application.Current?.Windows.FirstOrDefault()?.Page;
+                // If the current page is not null, display an alert to the user
+                if (currentPage != null)
+                {
+                    await currentPage.DisplayAlert("Error", "Item name cannot be empty and quantity must be greater than zero.", "OK");
+                }
                 return; // Exiting the method if validation fails
             }
 
@@ -76,7 +82,7 @@ namespace moes_shopping_list_app.ViewModels
             NewItemQuantity = 1;
         }
 
-        // Command to edit an existing shopping item
+        // Command to edit an existing shopping item asynchronously
         [RelayCommand]
         public async Task EditShoppingItem(ShoppingItem item)
         {
@@ -93,13 +99,6 @@ namespace moes_shopping_list_app.ViewModels
         [RelayCommand]
         public async Task UpdateShoppingItem(ShoppingItem item)
         {
-            // Checking if the item is null
-            if (item is null)
-            {
-                // ToDo: Implement error message
-                return; // Exiting the method if the item is null
-            }
-
             // Updating the item in the repository
             await _repository.UpdateShoppingItem(item);
             // Reloading the shopping items to reflect the changes
