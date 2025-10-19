@@ -1,15 +1,36 @@
 package com.moes_code.moes_shopping_list_app.view.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
@@ -17,6 +38,7 @@ import com.moes_code.moes_shopping_list_app.view.components.CategoryCard
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddItemDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDialog
+import com.moes_code.moes_shopping_list_app.view.theme.Colors
 import com.moes_code.moes_shopping_list_app.viewmodel.ShoppingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,12 +60,24 @@ fun ShoppingListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Shopping List") }
+                title = {
+                    Text(
+                        "Shopping List",
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Colors.secondary,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showAddCategoryDialog = true }
+                onClick = { showAddCategoryDialog = true },
+                containerColor = Colors.third,
+                contentColor = Colors.secondary
+
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Category")
             }
@@ -84,7 +118,9 @@ fun ShoppingListScreen(
                 categories.isEmpty() -> {
                     Text(
                         text = "No categories yet. Add one with the + button!",
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
+                        fontSize = 18.sp,
+                        color = Colors.secondary
                     )
                 }
 

@@ -1,17 +1,32 @@
 package com.moes_code.moes_shopping_list_app.view.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
+import com.moes_code.moes_shopping_list_app.view.theme.Colors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +40,10 @@ fun CategoryCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Colors.primary
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -38,17 +56,25 @@ fun CategoryCard(
                 Text(
                     text = category.name,
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Colors.secondary
                 )
                 Row {
                     IconButton(onClick = onAddItem) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Item")
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add Item",
+                            tint = Colors.third,
+                            modifier = Modifier.size(28.dp)
+                        )
                     }
                     IconButton(onClick = onDeleteCategory) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Delete Category",
-                            tint = MaterialTheme.colorScheme.error
+                            tint = Colors.fourth,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
@@ -67,7 +93,8 @@ fun CategoryCard(
                 Text(
                     text = "No items in this category",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontSize = 18.sp,
+                    color = Colors.secondary
                 )
             }
         }
