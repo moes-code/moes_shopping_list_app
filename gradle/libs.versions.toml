@@ -1,4 +1,5 @@
 [versions]
+appcompat = "1.7.1"
 agp = "8.13.0"
 kotlin = "2.2.20"
 coreKtx = "1.17.0"
@@ -12,6 +13,7 @@ lifecycleViewmodelCompose = "2.9.4"
 materialIcons = "1.7.8"
 
 [libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

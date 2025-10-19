@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.b1.shoppinglistapp"
+    namespace = "com.moes_code.moes_shopping_list_app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.b1.shoppinglistapp"
+        applicationId = "com.moes_code.moes_shopping_list_app"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
@@ -44,6 +44,7 @@ kotlin {
 
 dependencies {
 
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
