@@ -37,6 +37,7 @@ import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.view.components.CategoryCard
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddItemDialog
+import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDialog
 import com.moes_code.moes_shopping_list_app.view.theme.Colors
 import com.moes_code.moes_shopping_list_app.viewmodel.ShoppingViewModel
@@ -53,8 +54,10 @@ fun ShoppingListScreen(
 
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var showAddItemDialog by remember { mutableStateOf(false) }
+    var showEditCategoryDialog by remember { mutableStateOf(false) }
     var showEditItemDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
+    var selectedCategoryToEdit by remember { mutableStateOf<Category?>(null) }
     var selectedItem by remember { mutableStateOf<ShoppingItem?>(null) }
 
     Scaffold(
@@ -138,6 +141,10 @@ fun ShoppingListScreen(
                                     selectedCategory = category
                                     showAddItemDialog = true
                                 },
+                                onEditCategory = {
+                                    selectedCategoryToEdit = category
+                                    showEditCategoryDialog = true
+                                },
                                 onEditItem = { item ->
                                     selectedItem = item
                                     showEditItemDialog = true
@@ -145,6 +152,7 @@ fun ShoppingListScreen(
                                 onDeleteCategory = { viewModel.deleteCategory(category.id) },
                                 onDeleteItem = { itemId -> viewModel.deleteShoppingItem(itemId) }
                             )
+
                         }
                     }
                 }
@@ -173,6 +181,22 @@ fun ShoppingListScreen(
                 viewModel.addShoppingItem(name, quantity, selectedCategory!!.id)
                 showAddItemDialog = false
                 selectedCategory = null
+            }
+        )
+    }
+
+    if (showEditCategoryDialog && selectedCategoryToEdit != null) {
+        EditCategoryDialog(
+            category = selectedCategoryToEdit!!,
+            onDismiss = {
+                showEditCategoryDialog = false
+                selectedCategoryToEdit = null
+            },
+            onConfirm = { name ->
+                val updatedCategory = selectedCategoryToEdit!!.copy(name = name)
+                viewModel.updateCategory(updatedCategory)
+                showEditCategoryDialog = false
+                selectedCategoryToEdit = null
             }
         )
     }

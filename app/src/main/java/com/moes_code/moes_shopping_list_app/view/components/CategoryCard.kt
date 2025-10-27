@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +35,7 @@ fun CategoryCard(
     category: Category,
     items: List<ShoppingItem>,
     onAddItem: () -> Unit,
+    onEditCategory: () -> Unit,
     onEditItem: (ShoppingItem) -> Unit,
     onDeleteCategory: () -> Unit,
     onDeleteItem: (Int) -> Unit
@@ -66,6 +68,14 @@ fun CategoryCard(
                             Icons.Default.Add,
                             contentDescription = "Add Item",
                             tint = Colors.third,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                    IconButton(onClick = onEditCategory) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit Category",
+                            tint = Colors.secondary,
                             modifier = Modifier.size(28.dp)
                         )
                     }
