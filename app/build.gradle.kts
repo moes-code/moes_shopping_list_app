@@ -48,6 +48,14 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
+
+            // Configure debug symbols for release builds
+            isDebuggable = false
+            isJniDebuggable = false
+        }
+        debug {
+            isDebuggable = true
+            isJniDebuggable = true
         }
     }
     compileOptions {
