@@ -74,7 +74,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     // Insert default categories only when categories table is empty
     private fun insertDefaultCategories(db: SQLiteDatabase) {
-        val defaultCategories = listOf("Groceries", "Personal care")
+        val defaultCategories = listOf("Beverages", "Groceries", "Personal care")
 
         val cursor = db.rawQuery("SELECT COUNT(*) FROM $TABLE_CATEGORIES", null)
         var count = 0
