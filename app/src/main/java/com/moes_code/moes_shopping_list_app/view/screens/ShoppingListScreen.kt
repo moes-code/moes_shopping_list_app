@@ -123,7 +123,7 @@ fun ShoppingListScreen(
                         text = "No categories yet. Add one with the + button!",
                         modifier = Modifier.align(Alignment.Center),
                         fontSize = 18.sp,
-                        color = Colors.secondary
+                        color = Colors.moe_white
                     )
                 }
 

@@ -37,7 +37,7 @@ fun ShoppingItemRow(
             text = "${item.name} (${item.quantity})",
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 18.sp,
-            color = Colors.secondary,
+            color = Colors.moe_white,
             modifier = Modifier.weight(1f)
         )
         Row {
@@ -45,7 +45,7 @@ fun ShoppingItemRow(
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = "Edit Item",
-                    tint = Colors.secondary,
+                    tint = Colors.moe_white,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -53,7 +53,7 @@ fun ShoppingItemRow(
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = "Delete Item",
-                    tint = Colors.fourth,
+                    tint = Colors.moe_red,
                     modifier = Modifier.size(28.dp)
                 )
             }

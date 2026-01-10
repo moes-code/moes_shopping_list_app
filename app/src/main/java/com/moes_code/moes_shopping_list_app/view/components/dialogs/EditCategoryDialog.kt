@@ -39,9 +39,9 @@ fun EditCategoryDialog(
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 18.sp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Colors.primary,
-                    focusedLabelColor = Colors.primary,
-                    cursorColor = Colors.primary
+                    focusedBorderColor = Colors.moe_blue,
+                    focusedLabelColor = Colors.moe_blue,
+                    cursorColor = Colors.moe_blue
                 )
             )
         },
@@ -53,7 +53,7 @@ fun EditCategoryDialog(
                     }
                 },
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = Colors.third
+                    contentColor = Colors.moe_yellow
                 )
             ) {
                 Text("Save",
@@ -64,7 +64,7 @@ fun EditCategoryDialog(
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = Colors.fourth
+                    contentColor = Colors.moe_red
                 )
             ) {
                 Text("Cancel",

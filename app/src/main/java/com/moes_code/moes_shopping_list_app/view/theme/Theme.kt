@@ -9,14 +9,14 @@ fun ShoppingListAppTheme(
     content: @Composable () -> Unit
 ) {
     val blackColorScheme = darkColorScheme(
-        background = Colors.fifth,
-        surface = Colors.fifth,
-        surfaceVariant = Colors.fifth,
-        surfaceContainer = Colors.fifth,
-        surfaceContainerLowest = Colors.fifth,
-        surfaceContainerLow = Colors.fifth,
-        surfaceContainerHigh = Colors.fifth,
-        surfaceContainerHighest = Colors.fifth
+        background = Colors.moe_black,
+        surface = Colors.moe_black,
+        surfaceVariant = Colors.moe_black,
+        surfaceContainer = Colors.moe_black,
+        surfaceContainerLowest = Colors.moe_black,
+        surfaceContainerLow = Colors.moe_black,
+        surfaceContainerHigh = Colors.moe_black,
+        surfaceContainerHighest = Colors.moe_black
     )
 
     MaterialTheme(

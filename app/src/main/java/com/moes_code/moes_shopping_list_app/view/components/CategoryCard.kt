@@ -44,7 +44,7 @@ fun CategoryCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Colors.primary
+            containerColor = Colors.moe_blue
         )
     ) {
         Column(
@@ -60,14 +60,14 @@ fun CategoryCard(
                     style = MaterialTheme.typography.headlineSmall,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Colors.secondary
+                    color = Colors.moe_white
                 )
                 Row {
                     IconButton(onClick = onAddItem) {
                         Icon(
                             Icons.Default.Add,
                             contentDescription = "Add Item",
-                            tint = Colors.third,
+                            tint = Colors.moe_yellow,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -75,7 +75,7 @@ fun CategoryCard(
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Edit Category",
-                            tint = Colors.secondary,
+                            tint = Colors.moe_white,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -83,7 +83,7 @@ fun CategoryCard(
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Delete Category",
-                            tint = Colors.fourth,
+                            tint = Colors.moe_red,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -104,7 +104,7 @@ fun CategoryCard(
                     text = "No items in this category",
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 18.sp,
-                    color = Colors.secondary
+                    color = Colors.moe_white
                 )
             }
         }
