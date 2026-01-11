@@ -1,5 +1,6 @@
 package com.moes_code.moes_shopping_list_app.view.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -15,6 +17,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,10 +44,16 @@ fun CategoryCard(
     onDeleteItem: (Int) -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Colors.moe_blue,
+                shape = RoundedCornerShape(16.dp)
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Colors.moe_blue
+            containerColor = Colors.moe_black
         )
     ) {
         Column(
@@ -75,7 +84,7 @@ fun CategoryCard(
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Edit Category",
-                            tint = Colors.moe_white,
+                            tint = Colors.moe_blue,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -90,6 +99,14 @@ fun CategoryCard(
                 }
             }
 
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                color = Colors.moe_blue,
+                thickness = 1.dp
+            )
+
             if (items.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 items.forEach { item ->
@@ -100,11 +117,15 @@ fun CategoryCard(
                     )
                 }
             } else {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "No items in this category",
+                    text = "No items",
                     style = MaterialTheme.typography.bodyMedium,
                     fontSize = 18.sp,
-                    color = Colors.moe_white
+                    color = Colors.moe_white,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
                 )
             }
         }

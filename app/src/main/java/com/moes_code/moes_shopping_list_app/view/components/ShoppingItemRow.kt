@@ -45,7 +45,7 @@ fun ShoppingItemRow(
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = "Edit Item",
-                    tint = Colors.moe_white,
+                    tint = Colors.moe_blue,
                     modifier = Modifier.size(28.dp)
                 )
             }

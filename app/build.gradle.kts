@@ -52,6 +52,11 @@ android {
             // Configure debug symbols for release builds
             isDebuggable = false
             isJniDebuggable = false
+
+            // Debug symbols
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
         debug {
             isDebuggable = true
