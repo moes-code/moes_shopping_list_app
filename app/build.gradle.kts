@@ -1,9 +1,10 @@
+import com.android.build.api.dsl.ApplicationExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
 // Load keystore properties
-val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystorePropertiesFile: File = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
@@ -15,7 +16,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "com.moes_code.moes_shopping_list_app"
     compileSdk = 36
 
