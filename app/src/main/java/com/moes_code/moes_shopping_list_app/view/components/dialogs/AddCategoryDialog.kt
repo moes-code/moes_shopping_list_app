@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -36,6 +36,7 @@ fun AddCategoryDialog(
     onConfirm: (String) -> Unit
 ) {
     var categoryName by remember { mutableStateOf("") }
+    val isFormValid = categoryName.isNotBlank()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -58,6 +59,7 @@ fun AddCategoryDialog(
                     fontSize = 18.sp,
                 ) },
                 singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(
                     fontSize = 18.sp,
                     color = Colors.moe_white
@@ -94,7 +96,7 @@ fun AddCategoryDialog(
                         )
                 ) {
                     Icon(
-                        Icons.Default.Delete,
+                        Icons.Default.Close,
                         contentDescription = "Cancel",
                         tint = Colors.moe_red,
                         modifier = Modifier.size(28.dp)
@@ -106,25 +108,27 @@ fun AddCategoryDialog(
                 // Add Button
                 TextButton(
                     onClick = {
-                        if (categoryName.isNotBlank()) {
+                        if (isFormValid) {
                             onConfirm(categoryName)
                         }
                     },
+                    enabled = isFormValid,
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = Colors.moe_yellow
+                        contentColor = Colors.moe_yellow,
+                        disabledContentColor = Colors.moe_yellow.copy(alpha = 0.5f)
                     ),
                     modifier = Modifier
                         .weight(1f)
                         .border(
                             width = 2.dp,
-                            color = Colors.moe_yellow,
+                            color = if (isFormValid) Colors.moe_yellow else Colors.moe_yellow.copy(alpha = 0.5f),
                             shape = RoundedCornerShape(16.dp)
                         )
                 ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = "Add Category",
-                        tint = Colors.moe_yellow,
+                        tint = if (isFormValid) Colors.moe_yellow else Colors.moe_yellow.copy(alpha = 0.5f),
                         modifier = Modifier.size(28.dp)
                     )
                 }

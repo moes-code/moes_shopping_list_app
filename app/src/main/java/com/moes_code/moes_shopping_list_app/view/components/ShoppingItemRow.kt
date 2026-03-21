@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
@@ -38,6 +39,8 @@ fun ShoppingItemRow(
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 18.sp,
             color = Colors.moe_white,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
         Row {

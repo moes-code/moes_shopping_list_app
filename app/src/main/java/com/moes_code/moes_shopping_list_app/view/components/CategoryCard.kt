@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,13 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.view.theme.Colors
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryCard(
     category: Category,
@@ -69,7 +68,10 @@ fun CategoryCard(
                     style = MaterialTheme.typography.headlineSmall,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Colors.moe_white
+                    color = Colors.moe_white,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
                 Row {
                     IconButton(onClick = onAddItem) {

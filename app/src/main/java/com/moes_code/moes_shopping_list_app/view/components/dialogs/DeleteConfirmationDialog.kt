@@ -9,75 +9,50 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.view.theme.Colors
 
 @Composable
-fun EditCategoryDialog(
-    category: Category,
+fun DeleteConfirmationDialog(
+    title: String,
+    message: String,
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: () -> Unit
 ) {
-    var categoryName by remember { mutableStateOf(category.name) }
-    val isFormValid = categoryName.isNotBlank()
-
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier
             .border(
                 width = 2.dp,
-                color = Colors.moe_blue,
+                color = Colors.moe_red,
                 shape = RoundedCornerShape(16.dp)
             ),
-        title = { Text("Edit Category",
-            fontSize = 28.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) },
-        text = {
-            OutlinedTextField(
-                value = categoryName,
-                onValueChange = { categoryName = it },
-                label = { Text("Category Name",
-                    fontSize = 18.sp,
-                ) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                textStyle = TextStyle(
-                    fontSize = 18.sp,
-                    color = Colors.moe_white
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Colors.moe_blue,
-                    unfocusedBorderColor = Colors.moe_blue,
-                    focusedLabelColor = Colors.moe_white,
-                    unfocusedLabelColor = Colors.moe_white,
-                    focusedTextColor = Colors.moe_white,
-                    unfocusedTextColor = Colors.moe_white,
-                    cursorColor = Colors.moe_white
-                )
+        title = {
+            Text(
+                title,
+                fontSize = 28.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         },
-
+        text = {
+            Text(
+                message,
+                fontSize = 18.sp,
+                color = Colors.moe_white
+            )
+        },
         confirmButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -86,6 +61,33 @@ fun EditCategoryDialog(
                 // Cancel Button
                 TextButton(
                     onClick = onDismiss,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Colors.moe_green
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .border(
+                            width = 2.dp,
+                            color = Colors.moe_green,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Cancel",
+                        tint = Colors.moe_green,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Delete Button
+                TextButton(
+                    onClick = {
+                        onConfirm()
+                        onDismiss()
+                    },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = Colors.moe_red
                     ),
@@ -98,39 +100,9 @@ fun EditCategoryDialog(
                         )
                 ) {
                     Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Cancel",
+                        Icons.Default.Delete,
+                        contentDescription = "Delete",
                         tint = Colors.moe_red,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Save Button
-                TextButton(
-                    onClick = {
-                        if (isFormValid) {
-                            onConfirm(categoryName)
-                        }
-                    },
-                    enabled = isFormValid,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = Colors.moe_yellow,
-                        disabledContentColor = Colors.moe_yellow.copy(alpha = 0.5f)
-                    ),
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(
-                            width = 2.dp,
-                            color = if (isFormValid) Colors.moe_yellow else Colors.moe_yellow.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = "Save Category",
-                        tint = if (isFormValid) Colors.moe_yellow else Colors.moe_yellow.copy(alpha = 0.5f),
                         modifier = Modifier.size(28.dp)
                     )
                 }

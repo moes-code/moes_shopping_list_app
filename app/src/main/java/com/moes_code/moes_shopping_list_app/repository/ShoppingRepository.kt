@@ -2,6 +2,7 @@ package com.moes_code.moes_shopping_list_app.repository
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import com.moes_code.moes_shopping_list_app.database.DatabaseHelper
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
@@ -44,17 +45,22 @@ class ShoppingRepository(context: Context) {
     }
 
     // Updates an existing category by ID
+    // Returns number of rows updated, or -1 if duplicate name constraint violated
     suspend fun updateCategory(category: Category): Int = withContext(Dispatchers.IO) {
         val db = dbHelper.writableDatabase
         val values = ContentValues().apply {
             put(DatabaseHelper.CATEGORY_NAME, category.name)
         }
-        db.update(
-            DatabaseHelper.TABLE_CATEGORIES,
-            values,
-            "${DatabaseHelper.CATEGORY_ID} = ?",
-            arrayOf(category.id.toString())
-        )
+        try {
+            db.update(
+                DatabaseHelper.TABLE_CATEGORIES,
+                values,
+                "${DatabaseHelper.CATEGORY_ID} = ?",
+                arrayOf(category.id.toString())
+            )
+        } catch (e: SQLiteConstraintException) {
+            -1 // Duplicate name
+        }
     }
 
     // Deletes a category by ID
@@ -130,5 +136,10 @@ class ShoppingRepository(context: Context) {
             "${DatabaseHelper.ITEM_ID} = ?",
             arrayOf(id.toString())
         )
+    }
+
+    // Close database connection
+    fun close() {
+        dbHelper.close()
     }
 }

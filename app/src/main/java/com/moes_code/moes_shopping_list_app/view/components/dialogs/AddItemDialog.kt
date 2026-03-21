@@ -12,7 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -40,6 +40,9 @@ fun AddItemDialog(
 ) {
     var itemName by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("1") }
+    
+    val isQuantityValid = quantity.isNotEmpty() && quantity.toIntOrNull()?.let { it > 0 } == true
+    val isFormValid = itemName.isNotBlank() && isQuantityValid
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -65,6 +68,7 @@ fun AddItemDialog(
                         fontSize = 18.sp
                     ) },
                     singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
                     textStyle = TextStyle(
                         fontSize = 18.sp,
                         color = Colors.moe_white
@@ -81,24 +85,33 @@ fun AddItemDialog(
                 )
                 OutlinedTextField(
                     value = quantity,
-                    onValueChange = { quantity = it },
+                    onValueChange = { newValue ->
+                        quantity = newValue.filter { it.isDigit() }
+                    },
                     label = { Text("Quantity",
                         fontSize = 18.sp
                     ) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
+                    isError = !isQuantityValid,
+                    supportingText = if (!isQuantityValid) {
+                        { Text("Quantity must be greater than 0", color = Colors.moe_red) }
+                    } else null,
+                    modifier = Modifier.fillMaxWidth(),
                     textStyle = TextStyle(
                         fontSize = 18.sp,
                         color = Colors.moe_white
                     ),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Colors.moe_blue,
-                        unfocusedBorderColor = Colors.moe_blue,
+                        focusedBorderColor = if (isQuantityValid) Colors.moe_blue else Colors.moe_red,
+                        unfocusedBorderColor = if (isQuantityValid) Colors.moe_blue else Colors.moe_red,
                         focusedLabelColor = Colors.moe_white,
                         unfocusedLabelColor = Colors.moe_white,
                         focusedTextColor = Colors.moe_white,
                         unfocusedTextColor = Colors.moe_white,
-                        cursorColor = Colors.moe_white
+                        cursorColor = Colors.moe_white,
+                        errorBorderColor = Colors.moe_red,
+                        errorLabelColor = Colors.moe_red
                     )
                 )
             }
@@ -124,7 +137,7 @@ fun AddItemDialog(
                         )
                 ) {
                     Icon(
-                        Icons.Default.Delete,
+                        Icons.Default.Close,
                         contentDescription = "Cancel",
                         tint = Colors.moe_red,
                         modifier = Modifier.size(28.dp)
@@ -136,25 +149,27 @@ fun AddItemDialog(
                 // Add Button
                 TextButton(
                     onClick = {
-                        if (itemName.isNotBlank() && quantity.toIntOrNull()?.let { it > 0 } == true) {
+                        if (isFormValid) {
                             onConfirm(itemName, quantity.toInt())
                         }
                     },
+                    enabled = isFormValid,
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = Colors.moe_yellow
+                        contentColor = Colors.moe_yellow,
+                        disabledContentColor = Colors.moe_yellow.copy(alpha = 0.5f)
                     ),
                     modifier = Modifier
                         .weight(1f)
                         .border(
                             width = 2.dp,
-                            color = Colors.moe_yellow,
+                            color = if (isFormValid) Colors.moe_yellow else Colors.moe_yellow.copy(alpha = 0.5f),
                             shape = RoundedCornerShape(16.dp)
                         )
                 ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = "Add Item",
-                        tint = Colors.moe_yellow,
+                        tint = if (isFormValid) Colors.moe_yellow else Colors.moe_yellow.copy(alpha = 0.5f),
                         modifier = Modifier.size(28.dp)
                     )
                 }

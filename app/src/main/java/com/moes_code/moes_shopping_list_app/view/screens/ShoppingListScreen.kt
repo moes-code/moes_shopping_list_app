@@ -3,40 +3,34 @@ package com.moes_code.moes_shopping_list_app.view.screens
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,6 +41,7 @@ import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.view.components.CategoryCard
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddItemDialog
+import com.moes_code.moes_shopping_list_app.view.components.dialogs.DeleteConfirmationDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDialog
 import com.moes_code.moes_shopping_list_app.view.theme.Colors
@@ -62,13 +57,27 @@ fun ShoppingListScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show error messages as Snackbar
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearErrorMessage()
+        }
+    }
+
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var showAddItemDialog by remember { mutableStateOf(false) }
     var showEditCategoryDialog by remember { mutableStateOf(false) }
     var showEditItemDialog by remember { mutableStateOf(false) }
+    var showDeleteCategoryDialog by remember { mutableStateOf(false) }
+    var showDeleteItemDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     var selectedCategoryToEdit by remember { mutableStateOf<Category?>(null) }
+    var selectedCategoryToDelete by remember { mutableStateOf<Category?>(null) }
     var selectedItem by remember { mutableStateOf<ShoppingItem?>(null) }
+    var selectedItemToDelete by remember { mutableStateOf<ShoppingItem?>(null) }
 
     Scaffold(
         topBar = {
@@ -96,6 +105,15 @@ fun ShoppingListScreen(
                     }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = Colors.moe_red,
+                    contentColor = Colors.moe_white
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -132,26 +150,6 @@ fun ShoppingListScreen(
                     )
                 }
 
-                errorMessage != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = errorMessage ?: "Unknown error",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Button(
-                            onClick = {
-                                viewModel.clearErrorMessage()
-                                viewModel.loadData()
-                            }
-                        ) {
-                            Text("Retry")
-                        }
-                    }
-                }
-
                 categories.isEmpty() -> {
                     Text(
                         text = "No categories",
@@ -167,7 +165,7 @@ fun ShoppingListScreen(
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(categories) { category ->
+                        items(categories, key = { it.id }) { category ->
                             CategoryCard(
                                 category = category,
                                 items = shoppingItemsByCategory[category] ?: emptyList(),
@@ -183,8 +181,14 @@ fun ShoppingListScreen(
                                     selectedItem = item
                                     showEditItemDialog = true
                                 },
-                                onDeleteCategory = { viewModel.deleteCategory(category.id) },
-                                onDeleteItem = { itemId -> viewModel.deleteShoppingItem(itemId) }
+                                onDeleteCategory = {
+                                    selectedCategoryToDelete = category
+                                    showDeleteCategoryDialog = true
+                                },
+                                onDeleteItem = { itemId ->
+                                    selectedItemToDelete = shoppingItemsByCategory[category]?.find { it.id == itemId }
+                                    showDeleteItemDialog = true
+                                }
                             )
 
                         }
@@ -250,6 +254,35 @@ fun ShoppingListScreen(
                 viewModel.updateShoppingItem(updatedItem)
                 showEditItemDialog = false
                 selectedItem = null
+            }
+        )
+    }
+
+    // Delete confirmation dialogs
+    if (showDeleteCategoryDialog && selectedCategoryToDelete != null) {
+        DeleteConfirmationDialog(
+            title = "Delete Category",
+            message = "Are you sure you want to delete '${selectedCategoryToDelete!!.name}'? All items in this category will also be deleted.",
+            onDismiss = {
+                showDeleteCategoryDialog = false
+                selectedCategoryToDelete = null
+            },
+            onConfirm = {
+                viewModel.deleteCategory(selectedCategoryToDelete!!.id)
+            }
+        )
+    }
+
+    if (showDeleteItemDialog && selectedItemToDelete != null) {
+        DeleteConfirmationDialog(
+            title = "Delete Item",
+            message = "Are you sure you want to delete '${selectedItemToDelete!!.name}'?",
+            onDismiss = {
+                showDeleteItemDialog = false
+                selectedItemToDelete = null
+            },
+            onConfirm = {
+                viewModel.deleteShoppingItem(selectedItemToDelete!!.id)
             }
         )
     }

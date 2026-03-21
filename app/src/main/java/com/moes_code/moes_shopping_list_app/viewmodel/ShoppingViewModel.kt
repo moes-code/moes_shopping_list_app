@@ -85,8 +85,12 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 val category = Category(name = name.trim())
-                repository.addCategory(category)
-                loadCategories()
+                val result = repository.addCategory(category)
+                if (result == -1L) {
+                    _errorMessage.value = "Category '${name.trim()}' already exists"
+                } else {
+                    loadCategories()
+                }
             } catch (e: Exception) {
                 _errorMessage.value = "Error adding category: ${e.message}"
             }
@@ -100,9 +104,13 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
         viewModelScope.launch {
             try {
-                repository.updateCategory(category)
-                loadCategories()
-                loadShoppingItems()
+                val result = repository.updateCategory(category)
+                if (result == -1) {
+                    _errorMessage.value = "Category '${category.name.trim()}' already exists"
+                } else {
+                    loadCategories()
+                    loadShoppingItems()
+                }
             } catch (e: Exception) {
                 _errorMessage.value = "Error updating category: ${e.message}"
             }
@@ -178,5 +186,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // Helper to clear error state
     fun clearErrorMessage() {
         _errorMessage.value = null
+    }
+
+    // Close database when ViewModel is cleared
+    override fun onCleared() {
+        super.onCleared()
+        repository.close()
     }
 }

@@ -8,4 +8,5 @@ object Colors {
     val moe_blue = Color(0xff007bff)
     val moe_yellow = Color(0xffffd700)
     val moe_red = Color(0xffdc3545)
+    val moe_green = Color(0xff28a745)
 }

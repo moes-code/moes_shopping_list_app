@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep data model classes
+-keep class com.moes_code.moes_shopping_list_app.model.** { *; }
