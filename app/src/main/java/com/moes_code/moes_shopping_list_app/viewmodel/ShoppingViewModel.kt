@@ -6,75 +6,68 @@ import androidx.lifecycle.viewModelScope
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.repository.ShoppingRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = ShoppingRepository(application)
 
-    // Reactive list of categories
-    private val _categories = MutableStateFlow<List<Category>>(emptyList())
-    val categories: StateFlow<List<Category>> = _categories.asStateFlow()
-
-    // Shopping items grouped by category for structured UI
-    private val _shoppingItemsByCategory = MutableStateFlow<Map<Category, List<ShoppingItem>>>(emptyMap())
-    val shoppingItemsByCategory: StateFlow<Map<Category, List<ShoppingItem>>> = _shoppingItemsByCategory.asStateFlow()
-
-    // Loading indicator
-    private val _isLoading = MutableStateFlow(false)
+    // Loading indicator - true until first data emission
+    private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    // Reactive list of categories - automatically updates when database changes
+    val categories: StateFlow<List<Category>> = repository.getAllCategories()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    init {
+        // Mark loading as complete after first emission
+        viewModelScope.launch {
+            categories.first()
+            _isLoading.value = false
+        }
+    }
+
+    // Shopping items grouped by category - automatically updates when database changes
+    val shoppingItemsByCategory: StateFlow<Map<Category, List<ShoppingItem>>> = 
+        categories.flatMapLatest { categoryList ->
+            if (categoryList.isEmpty()) {
+                flowOf(emptyMap())
+            } else {
+                // Combine flows for all categories
+                val itemFlows = categoryList.map { category ->
+                    repository.getShoppingItemsByCategory(category.id)
+                        .combine(flowOf(category)) { items, cat -> cat to items }
+                }
+                combine(itemFlows) { pairs ->
+                    pairs.filter { it.second.isNotEmpty() }
+                        .toMap()
+                }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
 
     // Optional error message for UI display
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
-
-    init {
-        loadData()
-    }
-
-    // Load categories and shopping items, set loading state and handle errors
-    fun loadData() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _errorMessage.value = null
-            try {
-                loadCategories()
-                loadShoppingItems()
-            } catch (e: Exception) {
-                _errorMessage.value = "Error loading data: ${e.message}"
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    // Fetch all categories from repository
-    private suspend fun loadCategories() {
-        try {
-            _categories.value = repository.getAllCategories()
-        } catch (e: Exception) {
-            _errorMessage.value = "Error loading categories: ${e.message}"
-        }
-    }
-
-    // Fetch items for each category and group them
-    private suspend fun loadShoppingItems() {
-        try {
-            val itemsByCategory = mutableMapOf<Category, List<ShoppingItem>>()
-            _categories.value.forEach { category ->
-                val items = repository.getShoppingItemsByCategory(category.id)
-                if (items.isNotEmpty()) {
-                    itemsByCategory[category] = items
-                }
-            }
-            _shoppingItemsByCategory.value = itemsByCategory
-        } catch (e: Exception) {
-            _errorMessage.value = "Error loading shopping items: ${e.message}"
-        }
-    }
 
     // Category operations
     fun addCategory(name: String) {
@@ -88,9 +81,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 val result = repository.addCategory(category)
                 if (result == -1L) {
                     _errorMessage.value = "Category '${name.trim()}' already exists"
-                } else {
-                    loadCategories()
                 }
+                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error adding category: ${e.message}"
             }
@@ -107,10 +99,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 val result = repository.updateCategory(category)
                 if (result == -1) {
                     _errorMessage.value = "Category '${category.name.trim()}' already exists"
-                } else {
-                    loadCategories()
-                    loadShoppingItems()
                 }
+                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error updating category: ${e.message}"
             }
@@ -121,7 +111,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 repository.deleteCategory(categoryId)
-                loadData()
+                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error deleting category: ${e.message}"
             }
@@ -146,7 +136,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     categoryId = categoryId
                 )
                 repository.addShoppingItem(item)
-                loadShoppingItems()
+                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error adding item: ${e.message}"
             }
@@ -165,7 +155,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 repository.updateShoppingItem(item)
-                loadShoppingItems()
+                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error updating item: ${e.message}"
             }
@@ -176,7 +166,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 repository.deleteShoppingItem(itemId)
-                loadShoppingItems()
+                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error deleting item: ${e.message}"
             }
@@ -186,11 +176,5 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // Helper to clear error state
     fun clearErrorMessage() {
         _errorMessage.value = null
-    }
-
-    // Close database when ViewModel is cleared
-    override fun onCleared() {
-        super.onCleared()
-        repository.close()
     }
 }

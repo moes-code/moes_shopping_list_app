@@ -1,145 +1,50 @@
 package com.moes_code.moes_shopping_list_app.repository
 
-import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
-import com.moes_code.moes_shopping_list_app.database.DatabaseHelper
+import com.moes_code.moes_shopping_list_app.database.ShoppingDatabase
+import com.moes_code.moes_shopping_list_app.database.dao.CategoryDao
+import com.moes_code.moes_shopping_list_app.database.dao.ShoppingItemDao
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
 
 class ShoppingRepository(context: Context) {
-    private val dbHelper = DatabaseHelper(context)
-
+    
+    private val database = ShoppingDatabase.getInstance(context)
+    private val categoryDao: CategoryDao = database.categoryDao()
+    private val shoppingItemDao: ShoppingItemDao = database.shoppingItemDao()
+    
     // Category operations
-    // Retrieves all categories from the database, sorted by name
-    suspend fun getAllCategories(): List<Category> = withContext(Dispatchers.IO) {
-        val categories = mutableListOf<Category>()
-        val db = dbHelper.readableDatabase
-
-        val cursor = db.query(
-            DatabaseHelper.TABLE_CATEGORIES,
-            null, null, null, null, null,
-            DatabaseHelper.CATEGORY_NAME
-        )
-
-        cursor.use {
-            while (it.moveToNext()) {
-                val id = it.getInt(it.getColumnIndexOrThrow(DatabaseHelper.CATEGORY_ID))
-                val name = it.getString(it.getColumnIndexOrThrow(DatabaseHelper.CATEGORY_NAME))
-                categories.add(Category(id, name))
-            }
+    
+    fun getAllCategories(): Flow<List<Category>> = categoryDao.getAll()
+    
+    suspend fun addCategory(category: Category): Long {
+        return try {
+            categoryDao.insert(category)
+        } catch (_: SQLiteConstraintException) {
+            -1L // Duplicate name
         }
-
-        categories
     }
-
-    // Inserts a new category into the database
-    suspend fun addCategory(category: Category): Long = withContext(Dispatchers.IO) {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(DatabaseHelper.CATEGORY_NAME, category.name)
-        }
-        db.insert(DatabaseHelper.TABLE_CATEGORIES, null, values)
-    }
-
-    // Updates an existing category by ID
-    // Returns number of rows updated, or -1 if duplicate name constraint violated
-    suspend fun updateCategory(category: Category): Int = withContext(Dispatchers.IO) {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(DatabaseHelper.CATEGORY_NAME, category.name)
-        }
-        try {
-            db.update(
-                DatabaseHelper.TABLE_CATEGORIES,
-                values,
-                "${DatabaseHelper.CATEGORY_ID} = ?",
-                arrayOf(category.id.toString())
-            )
-        } catch (e: SQLiteConstraintException) {
+    
+    suspend fun updateCategory(category: Category): Int {
+        return try {
+            categoryDao.update(category)
+        } catch (_: SQLiteConstraintException) {
             -1 // Duplicate name
         }
     }
-
-    // Deletes a category by ID
-    // Cascade delete removes associated shopping items if foreign keys are set accordingly
-    suspend fun deleteCategory(id: Int): Int = withContext(Dispatchers.IO) {
-        val db = dbHelper.writableDatabase
-        db.delete(
-            DatabaseHelper.TABLE_CATEGORIES,
-            "${DatabaseHelper.CATEGORY_ID} = ?",
-            arrayOf(id.toString())
-        )
-    }
-
+    
+    suspend fun deleteCategory(id: Int): Int = categoryDao.deleteById(id)
+    
     // Shopping item operations
-    // Retrieves all shopping items for a given category ID, sorted by item name
-    suspend fun getShoppingItemsByCategory(categoryId: Int): List<ShoppingItem> = withContext(Dispatchers.IO) {
-        val items = mutableListOf<ShoppingItem>()
-        val db = dbHelper.readableDatabase
-
-        val cursor = db.query(
-            DatabaseHelper.TABLE_SHOPPING_ITEMS,
-            null,
-            "${DatabaseHelper.ITEM_CATEGORY_ID} = ?",
-            arrayOf(categoryId.toString()),
-            null, null,
-            DatabaseHelper.ITEM_NAME
-        )
-
-        cursor.use {
-            while (it.moveToNext()) {
-                val id = it.getInt(it.getColumnIndexOrThrow(DatabaseHelper.ITEM_ID))
-                val name = it.getString(it.getColumnIndexOrThrow(DatabaseHelper.ITEM_NAME))
-                val quantity = it.getInt(it.getColumnIndexOrThrow(DatabaseHelper.ITEM_QUANTITY))
-                items.add(ShoppingItem(id, name, quantity, categoryId))
-            }
-        }
-
-        items
-    }
-
-    // Inserts a new shopping item
-    suspend fun addShoppingItem(item: ShoppingItem): Long = withContext(Dispatchers.IO) {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(DatabaseHelper.ITEM_NAME, item.name)
-            put(DatabaseHelper.ITEM_QUANTITY, item.quantity)
-            put(DatabaseHelper.ITEM_CATEGORY_ID, item.categoryId)
-        }
-        db.insert(DatabaseHelper.TABLE_SHOPPING_ITEMS, null, values)
-    }
-
-    // Updates an existing shopping item by ID
-    suspend fun updateShoppingItem(item: ShoppingItem): Int = withContext(Dispatchers.IO) {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put(DatabaseHelper.ITEM_NAME, item.name)
-            put(DatabaseHelper.ITEM_QUANTITY, item.quantity)
-            put(DatabaseHelper.ITEM_CATEGORY_ID, item.categoryId)
-        }
-        db.update(
-            DatabaseHelper.TABLE_SHOPPING_ITEMS,
-            values,
-            "${DatabaseHelper.ITEM_ID} = ?",
-            arrayOf(item.id.toString())
-        )
-    }
-
-    // Deletes a shopping item by ID
-    suspend fun deleteShoppingItem(id: Int): Int = withContext(Dispatchers.IO) {
-        val db = dbHelper.writableDatabase
-        db.delete(
-            DatabaseHelper.TABLE_SHOPPING_ITEMS,
-            "${DatabaseHelper.ITEM_ID} = ?",
-            arrayOf(id.toString())
-        )
-    }
-
-    // Close database connection
-    fun close() {
-        dbHelper.close()
-    }
+    
+    fun getShoppingItemsByCategory(categoryId: Int): Flow<List<ShoppingItem>> = 
+        shoppingItemDao.getByCategory(categoryId)
+    
+    suspend fun addShoppingItem(item: ShoppingItem): Long = shoppingItemDao.insert(item)
+    
+    suspend fun updateShoppingItem(item: ShoppingItem): Int = shoppingItemDao.update(item)
+    
+    suspend fun deleteShoppingItem(id: Int): Int = shoppingItemDao.deleteById(id)
 }
