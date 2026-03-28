@@ -24,8 +24,8 @@ configure<ApplicationExtension> {
         applicationId = "com.moes_code.moes_shopping_list_app"
         minSdk = 29
         targetSdk = 36
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 3
+        versionName = "2.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -80,6 +80,7 @@ kotlin {
 dependencies {
 
     implementation(libs.androidx.appcompat)
+    implementation(libs.android.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

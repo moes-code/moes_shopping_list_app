@@ -1,40 +1,53 @@
 package com.moes_code.moes_shopping_list_app.view.screens
 
-import androidx.compose.foundation.border
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
@@ -47,6 +60,15 @@ import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDial
 import com.moes_code.moes_shopping_list_app.view.theme.Colors
 import com.moes_code.moes_shopping_list_app.viewmodel.ShoppingViewModel
 
+/**
+ * Sealed class representing the different UI states
+ */
+private sealed class ScreenState {
+    data object Loading : ScreenState()
+    data object Empty : ScreenState()
+    data class Content(val categories: List<Category>) : ScreenState()
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingListScreen(
@@ -58,6 +80,25 @@ fun ShoppingListScreen(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    
+    // Derive screen state
+    val screenState by remember {
+        derivedStateOf {
+            when {
+                isLoading -> ScreenState.Loading
+                categories.isEmpty() -> ScreenState.Empty
+                else -> ScreenState.Content(categories)
+            }
+        }
+    }
+    
+    // FAB expanded state based on scroll
+    val isFabExpanded by remember {
+        derivedStateOf {
+            scrollBehavior.state.collapsedFraction < 0.5f
+        }
+    }
 
     // Show error messages as Snackbar
     LaunchedEffect(errorMessage) {
@@ -78,121 +119,100 @@ fun ShoppingListScreen(
     var selectedCategoryToDelete by remember { mutableStateOf<Category?>(null) }
     var selectedItem by remember { mutableStateOf<ShoppingItem?>(null) }
     var selectedItemToDelete by remember { mutableStateOf<ShoppingItem?>(null) }
+    
+    // Trigger to reset swipe states when dialogs close
+    var swipeResetTrigger by remember { mutableIntStateOf(0) }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                modifier = Modifier.padding(bottom = 8.dp),
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "Shopping List",
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Colors.moe_white,
-                            modifier = Modifier
-                                .border(
-                                    width = 2.dp,
-                                    color = Colors.moe_blue,
-                                    shape = RoundedCornerShape(16.dp)
-                                )
-                                .padding(16.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            )
+            ShoppingListTopBar(scrollBehavior = scrollBehavior)
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 Snackbar(
                     snackbarData = data,
-                    containerColor = Colors.moe_red,
-                    contentColor = Colors.moe_white
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    shape = MaterialTheme.shapes.medium
                 )
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddCategoryDialog = true },
-                containerColor = Colors.moe_black,
-                contentColor = Colors.moe_yellow,
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    focusedElevation = 0.dp,
-                    hoveredElevation = 0.dp
-                ),
-                modifier = Modifier
-                    .border(
-                        width = 2.dp,
-                        color = Colors.moe_yellow,
-                        shape = RoundedCornerShape(16.dp)
+            AnimatedVisibility(
+                visible = screenState !is ScreenState.Loading,
+                enter = scaleIn(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
                     )
-
+                ) + fadeIn(),
+                exit = scaleOut() + fadeOut()
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Category")
+                ExtendedFloatingActionButton(
+                    onClick = { showAddCategoryDialog = true },
+                    expanded = isFabExpanded,
+                    icon = {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add Category"
+                        )
+                    },
+                    text = { Text("Add Category") },
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                )
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Box(
+        AnimatedContent(
+            targetState = screenState,
+            transitionSpec = {
+                fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) togetherWith
+                    fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow))
+            },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            when {
-                isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                .padding(paddingValues),
+            label = "ScreenStateAnimation"
+        ) { state ->
+            when (state) {
+                is ScreenState.Loading -> {
+                    LoadingContent()
                 }
-
-                categories.isEmpty() -> {
-                    Text(
-                        text = "No categories",
-                        modifier = Modifier.align(Alignment.Center),
-                        fontSize = 18.sp,
-                        color = Colors.moe_white
-                    )
+                is ScreenState.Empty -> {
+                    EmptyContent()
                 }
-
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(categories, key = { it.id }) { category ->
-                            CategoryCard(
-                                category = category,
-                                items = shoppingItemsByCategory[category] ?: emptyList(),
-                                onAddItem = {
-                                    selectedCategory = category
-                                    showAddItemDialog = true
-                                },
-                                onEditCategory = {
-                                    selectedCategoryToEdit = category
-                                    showEditCategoryDialog = true
-                                },
-                                onEditItem = { item ->
-                                    selectedItem = item
-                                    showEditItemDialog = true
-                                },
-                                onDeleteCategory = {
-                                    selectedCategoryToDelete = category
-                                    showDeleteCategoryDialog = true
-                                },
-                                onDeleteItem = { itemId ->
-                                    selectedItemToDelete = shoppingItemsByCategory[category]?.find { it.id == itemId }
-                                    showDeleteItemDialog = true
-                                }
-                            )
-
+                is ScreenState.Content -> {
+                    CategoryList(
+                        categories = state.categories,
+                        shoppingItemsByCategory = shoppingItemsByCategory,
+                        swipeResetTrigger = swipeResetTrigger,
+                        onAddItem = { category ->
+                            selectedCategory = category
+                            showAddItemDialog = true
+                        },
+                        onEditCategory = { category ->
+                            selectedCategoryToEdit = category
+                            showEditCategoryDialog = true
+                        },
+                        onEditItem = { item ->
+                            selectedItem = item
+                            showEditItemDialog = true
+                        },
+                        onDeleteCategory = { category ->
+                            selectedCategoryToDelete = category
+                            showDeleteCategoryDialog = true
+                        },
+                        onDeleteItem = { item ->
+                            selectedItemToDelete = item
+                            showDeleteItemDialog = true
+                        },
+                        onToggleItemCompleted = { item ->
+                            viewModel.toggleItemCompleted(item)
                         }
-                    }
+                    )
                 }
             }
         }
@@ -229,12 +249,14 @@ fun ShoppingListScreen(
             onDismiss = {
                 showEditCategoryDialog = false
                 selectedCategoryToEdit = null
+                swipeResetTrigger++
             },
             onConfirm = { name ->
                 val updatedCategory = selectedCategoryToEdit!!.copy(name = name)
                 viewModel.updateCategory(updatedCategory)
                 showEditCategoryDialog = false
                 selectedCategoryToEdit = null
+                swipeResetTrigger++
             }
         )
     }
@@ -245,6 +267,7 @@ fun ShoppingListScreen(
             onDismiss = {
                 showEditItemDialog = false
                 selectedItem = null
+                swipeResetTrigger++
             },
             onConfirm = { name, quantity ->
                 val updatedItem = selectedItem!!.copy(
@@ -254,6 +277,7 @@ fun ShoppingListScreen(
                 viewModel.updateShoppingItem(updatedItem)
                 showEditItemDialog = false
                 selectedItem = null
+                swipeResetTrigger++
             }
         )
     }
@@ -266,9 +290,11 @@ fun ShoppingListScreen(
             onDismiss = {
                 showDeleteCategoryDialog = false
                 selectedCategoryToDelete = null
+                swipeResetTrigger++
             },
             onConfirm = {
                 viewModel.deleteCategory(selectedCategoryToDelete!!.id)
+                swipeResetTrigger++
             }
         )
     }
@@ -280,10 +306,122 @@ fun ShoppingListScreen(
             onDismiss = {
                 showDeleteItemDialog = false
                 selectedItemToDelete = null
+                swipeResetTrigger++
             },
             onConfirm = {
                 viewModel.deleteShoppingItem(selectedItemToDelete!!.id)
+                swipeResetTrigger++
             }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShoppingListTopBar(
+    scrollBehavior: TopAppBarScrollBehavior
+) {
+    LargeTopAppBar(
+        title = {
+            Text(
+                text = "Shopping List",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            titleContentColor = MaterialTheme.colorScheme.onBackground
+        ),
+        scrollBehavior = scrollBehavior
+    )
+}
+
+@Composable
+private fun LoadingContent() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            color = Colors.moe_blue
+        )
+    }
+}
+
+@Composable
+private fun EmptyContent() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "No categories yet",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Tap the button below to add your first category",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryList(
+    categories: List<Category>,
+    shoppingItemsByCategory: Map<Category, List<ShoppingItem>>,
+    swipeResetTrigger: Int,
+    onAddItem: (Category) -> Unit,
+    onEditCategory: (Category) -> Unit,
+    onEditItem: (ShoppingItem) -> Unit,
+    onDeleteCategory: (Category) -> Unit,
+    onDeleteItem: (ShoppingItem) -> Unit,
+    onToggleItemCompleted: (ShoppingItem) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = 8.dp,
+            bottom = 88.dp // Extra space for FAB
+        ),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(
+            items = categories,
+            key = { it.id }
+        ) { category ->
+            CategoryCard(
+                category = category,
+                items = shoppingItemsByCategory[category] ?: emptyList(),
+                onAddItem = { onAddItem(category) },
+                onEditCategory = { onEditCategory(category) },
+                onEditItem = onEditItem,
+                onDeleteCategory = { onDeleteCategory(category) },
+                onDeleteItem = onDeleteItem,
+                onToggleItemCompleted = onToggleItemCompleted,
+                swipeResetTrigger = swipeResetTrigger,
+                modifier = Modifier.animateItem(
+                    fadeInSpec = spring(stiffness = Spring.StiffnessLow),
+                    fadeOutSpec = spring(stiffness = Spring.StiffnessLow),
+                    placementSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
+            )
+        }
     }
 }

@@ -24,5 +24,7 @@ data class ShoppingItem(
     val name: String,
     val quantity: Int = 1,
     @ColumnInfo(name = "category_id")
-    val categoryId: Int = 1
+    val categoryId: Int = 1,
+    @ColumnInfo(name = "is_completed", defaultValue = "0")
+    val isCompleted: Boolean = false
 )

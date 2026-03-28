@@ -133,7 +133,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 val item = ShoppingItem(
                     name = name.trim(),
                     quantity = quantity,
-                    categoryId = categoryId
+                    categoryId = categoryId,
+                    isCompleted = false
                 )
                 repository.addShoppingItem(item)
                 // No need to reload - Room Flow updates automatically
@@ -169,6 +170,21 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error deleting item: ${e.message}"
+            }
+        }
+    }
+
+    /**
+     * Toggle the completed status of a shopping item
+     */
+    fun toggleItemCompleted(item: ShoppingItem) {
+        viewModelScope.launch {
+            try {
+                val updatedItem = item.copy(isCompleted = !item.isCompleted)
+                repository.updateShoppingItem(updatedItem)
+                // No need to reload - Room Flow updates automatically
+            } catch (e: Exception) {
+                _errorMessage.value = "Error updating item: ${e.message}"
             }
         }
     }
