@@ -1,3 +1,54 @@
 <resources>
     <string name="app_name">Shopping List</string>
+    
+    <!-- Screen Titles -->
+    <string name="screen_title_shopping_list">Shopping List</string>
+    
+    <!-- Empty States -->
+    <string name="empty_categories_title">No categories yet</string>
+    <string name="empty_categories_subtitle">Tap the button below to add your first category</string>
+    <string name="empty_items_message">No items yet. Tap + to add one!</string>
+    
+    <!-- Category Actions -->
+    <string name="action_add_category">Add Category</string>
+    <string name="action_edit_category">Edit Category</string>
+    <string name="action_delete_category">Delete Category</string>
+    
+    <!-- Item Actions -->
+    <string name="action_add_item">Add Item</string>
+    <string name="action_edit_item">Edit Item</string>
+    <string name="action_delete_item">Delete Item</string>
+    
+    <!-- Dialog Titles -->
+    <string name="dialog_title_add_category">Add Category</string>
+    <string name="dialog_title_edit_category">Edit Category</string>
+    <string name="dialog_title_add_item">Add Item</string>
+    <string name="dialog_title_edit_item">Edit Item</string>
+    <string name="dialog_title_delete_category">Delete Category</string>
+    <string name="dialog_title_delete_item">Delete Item</string>
+    
+    <!-- Dialog Messages -->
+    <string name="dialog_message_delete_category">Are you sure you want to delete \'%1$s\'? All items in this category will also be deleted.</string>
+    <string name="dialog_message_delete_item">Are you sure you want to delete \'%1$s\'?</string>
+    
+    <!-- Form Labels -->
+    <string name="label_category_name">Category Name</string>
+    <string name="label_item_name">Item Name</string>
+    <string name="label_quantity">Quantity</string>
+    
+    <!-- Form Helper Text -->
+    <string name="helper_enter_category_name">Enter a name for your category</string>
+    <string name="helper_make_changes">Make changes to update the category</string>
+    <string name="error_quantity_invalid">Quantity must be greater than 0</string>
+    
+    <!-- Button Labels -->
+    <string name="button_add">Add</string>
+    <string name="button_save">Save</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_keep">Keep</string>
+    
+    <!-- Accessibility -->
+    <string name="content_description_expand">Expand</string>
+    <string name="content_description_collapse">Collapse</string>
 </resources>

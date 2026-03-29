@@ -46,9 +46,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moes_code.moes_shopping_list_app.R
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.view.components.CategoryCard
@@ -57,7 +58,7 @@ import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddItemDialo
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.DeleteConfirmationDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDialog
-import com.moes_code.moes_shopping_list_app.view.theme.Colors
+import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 import com.moes_code.moes_shopping_list_app.viewmodel.ShoppingViewModel
 
 /**
@@ -155,10 +156,10 @@ fun ShoppingListScreen(
                     icon = {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Add Category"
+                            contentDescription = stringResource(R.string.action_add_category)
                         )
                     },
-                    text = { Text("Add Category") },
+                    text = { Text(stringResource(R.string.action_add_category)) },
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary
                 )
@@ -285,8 +286,8 @@ fun ShoppingListScreen(
     // Delete confirmation dialogs
     if (showDeleteCategoryDialog && selectedCategoryToDelete != null) {
         DeleteConfirmationDialog(
-            title = "Delete Category",
-            message = "Are you sure you want to delete '${selectedCategoryToDelete!!.name}'? All items in this category will also be deleted.",
+            title = stringResource(R.string.dialog_title_delete_category),
+            message = stringResource(R.string.dialog_message_delete_category, selectedCategoryToDelete!!.name),
             onDismiss = {
                 showDeleteCategoryDialog = false
                 selectedCategoryToDelete = null
@@ -301,8 +302,8 @@ fun ShoppingListScreen(
 
     if (showDeleteItemDialog && selectedItemToDelete != null) {
         DeleteConfirmationDialog(
-            title = "Delete Item",
-            message = "Are you sure you want to delete '${selectedItemToDelete!!.name}'?",
+            title = stringResource(R.string.dialog_title_delete_item),
+            message = stringResource(R.string.dialog_message_delete_item, selectedItemToDelete!!.name),
             onDismiss = {
                 showDeleteItemDialog = false
                 selectedItemToDelete = null
@@ -324,7 +325,7 @@ private fun ShoppingListTopBar(
     LargeTopAppBar(
         title = {
             Text(
-                text = "Shopping List",
+                text = stringResource(R.string.screen_title_shopping_list),
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
@@ -332,7 +333,7 @@ private fun ShoppingListTopBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
-            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            scrolledContainerColor = MaterialTheme.colorScheme.background,
             titleContentColor = MaterialTheme.colorScheme.onBackground
         ),
         scrollBehavior = scrollBehavior
@@ -346,7 +347,7 @@ private fun LoadingContent() {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = Colors.moe_blue
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -361,14 +362,14 @@ private fun EmptyContent() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "No categories yet",
+                text = stringResource(R.string.empty_categories_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.emptyContentSpacing))
             Text(
-                text = "Tap the button below to add your first category",
+                text = stringResource(R.string.empty_categories_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 textAlign = TextAlign.Center
@@ -392,12 +393,12 @@ private fun CategoryList(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            start = 16.dp,
-            end = 16.dp,
-            top = 8.dp,
-            bottom = 88.dp // Extra space for FAB
+            start = Dimensions.listPaddingHorizontal,
+            end = Dimensions.listPaddingHorizontal,
+            top = Dimensions.listPaddingTop,
+            bottom = Dimensions.listPaddingBottom
         ),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.listItemSpacing)
     ) {
         items(
             items = categories,

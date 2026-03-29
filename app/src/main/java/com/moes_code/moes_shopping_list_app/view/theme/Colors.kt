@@ -20,7 +20,7 @@ object Colors {
     
     // === SURFACE VARIANTS (Used in ColorScheme definition) ===
     val surface = Color(0xFF0A0A0A)           // Slightly lighter than pure black
-    val surfaceVariant = Color(0xFF141414)    // Card backgrounds
+    val surfaceVariant = Color(0xFF101010)    // Card backgrounds (darker)
     val surfaceElevated = Color(0xFF1C1C1C)   // Dialogs, elevated surfaces
     val surfaceContainer = Color(0xFF1E1E1E)  // Containers within cards
     val surfaceContainerHigh = Color(0xFF252525) // Higher elevation containers

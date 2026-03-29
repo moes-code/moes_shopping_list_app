@@ -8,35 +8,36 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import com.moes_code.moes_shopping_list_app.R
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
-import com.moes_code.moes_shopping_list_app.view.theme.Colors
+import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 
+/**
+ * A row displaying a shopping item with checkbox, name, quantity, and action buttons.
+ * Supports swipe actions for edit/delete.
+ */
 @Composable
 fun ShoppingItemRow(
     item: ShoppingItem,
@@ -47,15 +48,15 @@ fun ShoppingItemRow(
 ) {
     val colorScheme = MaterialTheme.colorScheme
     
-    // Animate background color based on completed state
-    val backgroundColor by animateColorAsState(
+    // Animate border color based on completed state (dimmed when completed)
+    val borderColor by animateColorAsState(
         targetValue = if (item.isCompleted) {
-            colorScheme.surfaceContainer.copy(alpha = 0.5f)
+            colorScheme.primary.copy(alpha = 0.4f)
         } else {
-            colorScheme.surfaceContainer
+            colorScheme.primary
         },
         animationSpec = tween(300),
-        label = "backgroundColorAnimation"
+        label = "borderColorAnimation"
     )
     
     // Animate text color based on completed state
@@ -72,136 +73,96 @@ fun ShoppingItemRow(
     SwipeableItem(
         onSwipeLeft = onDelete,
         onSwipeRight = onEdit,
-        enableSwipeLeft = true,
-        enableSwipeRight = true,
         resetTrigger = swipeResetTrigger,
         backgroundContent = { direction ->
-            ItemSwipeBackground(direction = direction)
+            SwipeBackground(
+                direction = direction,
+                shape = MaterialTheme.shapes.medium,
+                horizontalPadding = Dimensions.swipePaddingItem,
+                iconSize = Dimensions.swipeIconSizeItem
+            )
         }
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(MaterialTheme.shapes.medium)
-                .background(backgroundColor)
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Checkbox for completed state
-            Checkbox(
-                checked = item.isCompleted,
-                onCheckedChange = { onToggleCompleted() },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = colorScheme.tertiary,
-                    uncheckedColor = colorScheme.outline,
-                    checkmarkColor = colorScheme.onTertiary
-                )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(
+                containerColor = colorScheme.background
+            ),
+            border = BorderStroke(
+                width = Dimensions.itemBorderWidth,
+                color = borderColor
             )
-            
-            // Item name and quantity with animation
-            AnimatedContent(
-                targetState = item.isCompleted,
-                transitionSpec = {
-                    fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) togetherWith
-                        fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow))
-                },
-                modifier = Modifier.weight(1f),
-                label = "completedStateAnimation"
-            ) { isCompleted ->
-                Text(
-                    text = "${item.name} (${item.quantity})",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = textColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
-                )
-            }
-            
-            // Action buttons
+        ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                // Edit Button
-                FilledTonalIconButton(
-                    onClick = onEdit,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = colorScheme.primaryContainer,
-                        contentColor = colorScheme.onPrimaryContainer
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = Dimensions.itemPaddingHorizontal,
+                        vertical = Dimensions.itemPaddingVertical
                     ),
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Edit Item",
-                        modifier = Modifier.size(18.dp)
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Checkbox for completed state
+                Checkbox(
+                    checked = item.isCompleted,
+                    onCheckedChange = { onToggleCompleted() },
+                    modifier = Modifier.scale(Dimensions.CHECKBOX_SCALE),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = colorScheme.tertiary,
+                        uncheckedColor = colorScheme.outline,
+                        checkmarkColor = colorScheme.onTertiary
+                    )
+                )
+                
+                // Item name and quantity with animation
+                AnimatedContent(
+                    targetState = item.isCompleted,
+                    transitionSpec = {
+                        fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) togetherWith
+                            fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow))
+                    },
+                    modifier = Modifier.weight(1f),
+                    label = "completedStateAnimation"
+                ) { isCompleted ->
+                    Text(
+                        text = "${item.name} (${item.quantity})",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = textColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
                     )
                 }
                 
-                // Delete Button
-                FilledTonalIconButton(
-                    onClick = onDelete,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = colorScheme.errorContainer,
-                        contentColor = colorScheme.onErrorContainer
-                    ),
-                    modifier = Modifier.size(36.dp)
+                // Action buttons
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.itemButtonSpacing)
                 ) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete Item",
-                        modifier = Modifier.size(18.dp)
+                    // Edit Button
+                    ActionIconButton(
+                        onClick = onEdit,
+                        icon = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.action_edit_item),
+                        containerColor = colorScheme.primaryContainer,
+                        contentColor = colorScheme.onPrimaryContainer,
+                        buttonSize = Dimensions.itemButtonSize,
+                        iconSize = Dimensions.itemIconSize
+                    )
+                    
+                    // Delete Button
+                    ActionIconButton(
+                        onClick = onDelete,
+                        icon = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.action_delete_item),
+                        containerColor = colorScheme.errorContainer,
+                        contentColor = colorScheme.onErrorContainer,
+                        buttonSize = Dimensions.itemButtonSize,
+                        iconSize = Dimensions.itemIconSize
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun ItemSwipeBackground(direction: SwipeDirection) {
-    val colorScheme = MaterialTheme.colorScheme
-    
-    val (backgroundColor, icon, alignment) = when (direction) {
-        SwipeDirection.Right -> Triple(
-            Colors.swipeEditBackground,
-            Icons.Default.Edit,
-            Alignment.CenterStart
-        )
-        SwipeDirection.Left -> Triple(
-            Colors.swipeDeleteBackground,
-            Icons.Default.Delete,
-            Alignment.CenterEnd
-        )
-        SwipeDirection.None -> Triple(
-            colorScheme.surfaceContainer,
-            Icons.Default.Delete,
-            Alignment.CenterEnd
-        )
-    }
-    
-    val iconTint = when (direction) {
-        SwipeDirection.Right -> colorScheme.primary
-        SwipeDirection.Left -> colorScheme.error
-        SwipeDirection.None -> colorScheme.error
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clip(MaterialTheme.shapes.medium)
-            .background(backgroundColor)
-            .padding(horizontal = 16.dp),
-        contentAlignment = alignment
-    ) {
-        if (direction != SwipeDirection.None) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(24.dp)
-            )
         }
     }
 }

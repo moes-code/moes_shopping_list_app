@@ -2,33 +2,33 @@ package com.moes_code.moes_shopping_list_app.view.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,13 +38,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import com.moes_code.moes_shopping_list_app.R
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
-import com.moes_code.moes_shopping_list_app.view.theme.Colors
+import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 
+/**
+ * A card displaying a category with its items.
+ * Supports swipe actions for edit/delete and expandable/collapsible items list.
+ */
 @Composable
 fun CategoryCard(
     category: Category,
@@ -59,119 +64,65 @@ fun CategoryCard(
     swipeResetTrigger: Any? = null
 ) {
     var isExpanded by remember { mutableStateOf(true) }
+    
+    // Animate rotation for expand icon (0° when expanded, 180° when collapsed)
+    val expandIconRotation by animateFloatAsState(
+        targetValue = if (isExpanded) 0f else 180f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "expandIconRotation"
+    )
 
     SwipeableItem(
         onSwipeLeft = onDeleteCategory,
         onSwipeRight = onEditCategory,
         modifier = modifier,
-        enableSwipeLeft = true,
-        enableSwipeRight = true,
         resetTrigger = swipeResetTrigger,
         backgroundContent = { direction ->
-            CategorySwipeBackground(direction = direction)
+            SwipeBackground(
+                direction = direction,
+                shape = MaterialTheme.shapes.large,
+                horizontalPadding = Dimensions.swipePaddingCategory,
+                iconSize = Dimensions.swipeIconSizeCategory
+            )
         }
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                containerColor = MaterialTheme.colorScheme.background
+            ),
+            border = BorderStroke(
+                width = Dimensions.categoryBorderWidth,
+                color = MaterialTheme.colorScheme.primary
             )
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(Dimensions.categoryPadding)
             ) {
                 // Header Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Category name with icon
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.ShoppingCart,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.size(12.dp))
-                        Text(
-                            text = category.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    
-                    // Action buttons
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        // Add Item Button
-                        FilledTonalIconButton(
-                            onClick = onAddItem,
-                            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                            ),
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = "Add Item",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                        
-                        // Edit Category Button
-                        FilledTonalIconButton(
-                            onClick = onEditCategory,
-                            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            ),
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Edit Category",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                        
-                        // Delete Category Button
-                        FilledTonalIconButton(
-                            onClick = onDeleteCategory,
-                            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer,
-                                contentColor = MaterialTheme.colorScheme.onErrorContainer
-                            ),
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Delete Category",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                }
+                CategoryHeader(
+                    categoryName = category.name,
+                    isExpanded = isExpanded,
+                    expandIconRotation = expandIconRotation,
+                    onExpandClick = { isExpanded = !isExpanded },
+                    onAddItem = onAddItem,
+                    onEditCategory = onEditCategory,
+                    onDeleteCategory = onDeleteCategory
+                )
 
                 // Divider
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    color = MaterialTheme.colorScheme.outline,
-                    thickness = 1.dp
+                        .padding(vertical = Dimensions.categoryDividerPadding),
+                    color = MaterialTheme.colorScheme.outline
                 )
 
-                // Items List
+                // Items List (expandable)
                 AnimatedVisibility(
                     visible = isExpanded,
                     enter = expandVertically(
@@ -182,87 +133,160 @@ fun CategoryCard(
                     ) + fadeIn(),
                     exit = shrinkVertically() + fadeOut()
                 ) {
-                    Column {
-                        if (items.isNotEmpty()) {
-                            items.forEachIndexed { index, item ->
-                                ShoppingItemRow(
-                                    item = item,
-                                    onEdit = { onEditItem(item) },
-                                    onDelete = { onDeleteItem(item) },
-                                    onToggleCompleted = { onToggleItemCompleted(item) },
-                                    swipeResetTrigger = swipeResetTrigger
-                                )
-                                if (index < items.lastIndex) {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                }
-                            }
-                        } else {
-                            EmptyItemsPlaceholder()
-                        }
-                    }
+                    CategoryItemsList(
+                        items = items,
+                        onEditItem = onEditItem,
+                        onDeleteItem = onDeleteItem,
+                        onToggleItemCompleted = onToggleItemCompleted,
+                        swipeResetTrigger = swipeResetTrigger
+                    )
                 }
             }
         }
     }
 }
 
+/**
+ * Header row for the category card containing expand button, title, and action buttons.
+ */
 @Composable
-private fun CategorySwipeBackground(direction: SwipeDirection) {
-    val (backgroundColor, icon, alignment) = when (direction) {
-        SwipeDirection.Right -> Triple(
-            Colors.swipeEditBackground,
-            Icons.Default.Edit,
-            Alignment.CenterStart
-        )
-        SwipeDirection.Left -> Triple(
-            Colors.swipeDeleteBackground,
-            Icons.Default.Delete,
-            Alignment.CenterEnd
-        )
-        SwipeDirection.None -> Triple(
-            MaterialTheme.colorScheme.surfaceVariant,
-            Icons.Default.Delete,
-            Alignment.CenterEnd
-        )
-    }
+private fun CategoryHeader(
+    categoryName: String,
+    isExpanded: Boolean,
+    expandIconRotation: Float,
+    onExpandClick: () -> Unit,
+    onAddItem: () -> Unit,
+    onEditCategory: () -> Unit,
+    onDeleteCategory: () -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
     
-    val iconTint = when (direction) {
-        SwipeDirection.Right -> MaterialTheme.colorScheme.primary
-        SwipeDirection.Left -> MaterialTheme.colorScheme.error
-        SwipeDirection.None -> MaterialTheme.colorScheme.error
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clip(MaterialTheme.shapes.large)
-            .background(backgroundColor)
-            .padding(horizontal = 24.dp),
-        contentAlignment = alignment
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        if (direction != SwipeDirection.None) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(28.dp)
+        // Expand button + Category name
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f)
+        ) {
+            // Expand/Collapse button (transparent)
+            IconButton(
+                onClick = onExpandClick,
+                modifier = Modifier.size(Dimensions.expandButtonSize)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = stringResource(
+                        if (isExpanded) R.string.content_description_collapse 
+                        else R.string.content_description_expand
+                    ),
+                    tint = colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(Dimensions.expandIconSize)
+                        .rotate(expandIconRotation)
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(Dimensions.expandButtonTitleSpacing))
+            
+            // Category name
+            Text(
+                text = categoryName,
+                style = MaterialTheme.typography.titleLarge,
+                color = colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        
+        // Action buttons
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.categoryButtonSpacing)
+        ) {
+            // Add Item Button
+            ActionIconButton(
+                onClick = onAddItem,
+                icon = Icons.Default.Add,
+                contentDescription = stringResource(R.string.action_add_item),
+                containerColor = colorScheme.secondaryContainer,
+                contentColor = colorScheme.onSecondaryContainer,
+                buttonSize = Dimensions.categoryButtonSize,
+                iconSize = Dimensions.categoryIconSize
+            )
+            
+            // Edit Category Button
+            ActionIconButton(
+                onClick = onEditCategory,
+                icon = Icons.Default.Edit,
+                contentDescription = stringResource(R.string.action_edit_category),
+                containerColor = colorScheme.primaryContainer,
+                contentColor = colorScheme.onPrimaryContainer,
+                buttonSize = Dimensions.categoryButtonSize,
+                iconSize = Dimensions.categoryIconSize
+            )
+            
+            // Delete Category Button
+            ActionIconButton(
+                onClick = onDeleteCategory,
+                icon = Icons.Default.Delete,
+                contentDescription = stringResource(R.string.action_delete_category),
+                containerColor = colorScheme.errorContainer,
+                contentColor = colorScheme.onErrorContainer,
+                buttonSize = Dimensions.categoryButtonSize,
+                iconSize = Dimensions.categoryIconSize
             )
         }
     }
 }
 
+/**
+ * List of shopping items within a category.
+ */
+@Composable
+private fun CategoryItemsList(
+    items: List<ShoppingItem>,
+    onEditItem: (ShoppingItem) -> Unit,
+    onDeleteItem: (ShoppingItem) -> Unit,
+    onToggleItemCompleted: (ShoppingItem) -> Unit,
+    swipeResetTrigger: Any?
+) {
+    Column {
+        if (items.isNotEmpty()) {
+            items.forEachIndexed { index, item ->
+                ShoppingItemRow(
+                    item = item,
+                    onEdit = { onEditItem(item) },
+                    onDelete = { onDeleteItem(item) },
+                    onToggleCompleted = { onToggleItemCompleted(item) },
+                    swipeResetTrigger = swipeResetTrigger
+                )
+                if (index < items.lastIndex) {
+                    Spacer(modifier = Modifier.height(Dimensions.itemSpacingInCategory))
+                }
+            }
+        } else {
+            EmptyItemsPlaceholder()
+        }
+    }
+}
+
+/**
+ * Placeholder shown when a category has no items.
+ */
 @Composable
 private fun EmptyItemsPlaceholder() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = Dimensions.emptyPlaceholderPadding),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "No items yet. Tap + to add one!",
+            text = stringResource(R.string.empty_items_message),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

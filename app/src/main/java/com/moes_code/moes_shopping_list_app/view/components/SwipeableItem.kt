@@ -21,7 +21,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
+import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlin.math.roundToInt
@@ -76,7 +76,8 @@ fun SwipeableItem(
     val density = LocalDensity.current
     
     // Swipe distance in pixels (using a fixed distance for consistent feel)
-    val swipeDistancePx = with(density) { 120.dp.toPx() }
+    val swipeDistancePx = with(density) { Dimensions.swipeDistance.toPx() }
+    val swipeThresholdPx = with(density) { Dimensions.swipeDirectionThreshold.toPx() }
     
     // Create state with simple constructor
     val state = rememberSaveable(saver = AnchoredDraggableState.Saver()) {
@@ -130,8 +131,8 @@ fun SwipeableItem(
             val offset = state.offset
             when {
                 offset.isNaN() -> SwipeDirection.None
-                offset > 10f -> SwipeDirection.Right
-                offset < -10f -> SwipeDirection.Left
+                offset > swipeThresholdPx -> SwipeDirection.Right
+                offset < -swipeThresholdPx -> SwipeDirection.Left
                 else -> SwipeDirection.None
             }
         }
