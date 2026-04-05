@@ -24,8 +24,8 @@ configure<ApplicationExtension> {
         applicationId = "com.moes_code.moes_shopping_list_app"
         minSdk = 29
         targetSdk = 36
-        versionCode = 3
-        versionName = "2.5"
+        versionCode = 5
+        versionName = "2.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

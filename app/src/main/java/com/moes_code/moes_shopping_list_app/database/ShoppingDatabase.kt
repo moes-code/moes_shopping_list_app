@@ -10,7 +10,6 @@ import com.moes_code.moes_shopping_list_app.database.dao.CategoryDao
 import com.moes_code.moes_shopping_list_app.database.dao.ShoppingItemDao
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
-import java.util.concurrent.Executors
 
 @Database(
     entities = [Category::class, ShoppingItem::class],
@@ -52,23 +51,16 @@ abstract class ShoppingDatabase : RoomDatabase() {
                 DATABASE_NAME
             )
                 .addMigrations(MIGRATION_1_2)
-                .addCallback(SeedDatabaseCallback(context))
+                .addCallback(SeedDatabaseCallback())
                 .build()
         }
         
-        private class SeedDatabaseCallback(
-            private val context: Context
-        ) : Callback() {
+        private class SeedDatabaseCallback : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                // Use a single-thread executor to seed default categories
-                Executors.newSingleThreadExecutor().execute {
-                    getInstance(context).categoryDao().apply {
-                        insertSync(Category(name = "Beverages"))
-                        insertSync(Category(name = "Groceries"))
-                        insertSync(Category(name = "Personal care"))
-                    }
-                }
+                db.execSQL("INSERT INTO categories (name) VALUES ('Beverages')")
+                db.execSQL("INSERT INTO categories (name) VALUES ('Groceries')")
+                db.execSQL("INSERT INTO categories (name) VALUES ('Personal care')")
             }
         }
     }

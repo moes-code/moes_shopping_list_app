@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -36,9 +37,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         )
 
     init {
-        // Mark loading as complete after first emission
         viewModelScope.launch {
-            categories.first()
+            categories.filter { it.isNotEmpty() }.first()
             _isLoading.value = false
         }
     }
