@@ -53,6 +53,10 @@ configure<ApplicationExtension> {
             isDebuggable = false
             isJniDebuggable = false
 
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
+
         }
         debug {
             isDebuggable = true
