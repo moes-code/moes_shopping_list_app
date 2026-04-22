@@ -135,33 +135,6 @@ fun ShoppingItemRow(
                         textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
                     )
                 }
-                
-                // Action buttons
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(Dimensions.itemButtonSpacing)
-                ) {
-                    // Edit Button
-                    ActionIconButton(
-                        onClick = onEdit,
-                        icon = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.action_edit_item),
-                        containerColor = colorScheme.primaryContainer,
-                        contentColor = colorScheme.onPrimaryContainer,
-                        buttonSize = Dimensions.itemButtonSize,
-                        iconSize = Dimensions.itemIconSize
-                    )
-                    
-                    // Delete Button
-                    ActionIconButton(
-                        onClick = onDelete,
-                        icon = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.action_delete_item),
-                        containerColor = colorScheme.errorContainer,
-                        contentColor = colorScheme.onErrorContainer,
-                        buttonSize = Dimensions.itemButtonSize,
-                        iconSize = Dimensions.itemIconSize
-                    )
-                }
             }
         }
     }

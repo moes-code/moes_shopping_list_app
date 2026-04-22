@@ -215,28 +215,6 @@ private fun CategoryHeader(
                 buttonSize = Dimensions.categoryButtonSize,
                 iconSize = Dimensions.categoryIconSize
             )
-            
-            // Edit Category Button
-            ActionIconButton(
-                onClick = onEditCategory,
-                icon = Icons.Default.Edit,
-                contentDescription = stringResource(R.string.action_edit_category),
-                containerColor = colorScheme.primaryContainer,
-                contentColor = colorScheme.onPrimaryContainer,
-                buttonSize = Dimensions.categoryButtonSize,
-                iconSize = Dimensions.categoryIconSize
-            )
-            
-            // Delete Category Button
-            ActionIconButton(
-                onClick = onDeleteCategory,
-                icon = Icons.Default.Delete,
-                contentDescription = stringResource(R.string.action_delete_category),
-                containerColor = colorScheme.errorContainer,
-                contentColor = colorScheme.onErrorContainer,
-                buttonSize = Dimensions.categoryButtonSize,
-                iconSize = Dimensions.categoryIconSize
-            )
         }
     }
 }
