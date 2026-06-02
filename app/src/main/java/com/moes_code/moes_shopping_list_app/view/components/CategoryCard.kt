@@ -58,16 +58,15 @@ fun CategoryCard(
     onEditCategory: () -> Unit,
     onEditItem: (ShoppingItem) -> Unit,
     onDeleteCategory: () -> Unit,
+    onToggleExpand: () -> Unit,
     onDeleteItem: (ShoppingItem) -> Unit,
     onToggleItemCompleted: (ShoppingItem) -> Unit,
     modifier: Modifier = Modifier,
     swipeResetTrigger: Any? = null
 ) {
-    var isExpanded by remember { mutableStateOf(true) }
-    
     // Animate rotation for expand icon (0° when expanded, 180° when collapsed)
     val expandIconRotation by animateFloatAsState(
-        targetValue = if (isExpanded) 0f else 180f,
+        targetValue = if (category.isExpanded) 0f else 180f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
@@ -106,9 +105,9 @@ fun CategoryCard(
                 // Header Row
                 CategoryHeader(
                     categoryName = category.name,
-                    isExpanded = isExpanded,
+                    isExpanded = category.isExpanded,
                     expandIconRotation = expandIconRotation,
-                    onExpandClick = { isExpanded = !isExpanded },
+                    onExpandClick = onToggleExpand,
                     onAddItem = onAddItem,
                     onEditCategory = onEditCategory,
                     onDeleteCategory = onDeleteCategory
@@ -124,7 +123,7 @@ fun CategoryCard(
 
                 // Items List (expandable)
                 AnimatedVisibility(
-                    visible = isExpanded,
+                    visible = category.isExpanded,
                     enter = expandVertically(
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioMediumBouncy,

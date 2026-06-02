@@ -210,6 +210,9 @@ fun ShoppingListScreen(
                             selectedItemToDelete = item
                             showDeleteItemDialog = true
                         },
+                        onToggleExpand = { category ->
+                            viewModel.toggleCategoryExpand(category)
+                        },
                         onToggleItemCompleted = { item ->
                             viewModel.toggleItemCompleted(item)
                         }
@@ -388,6 +391,7 @@ private fun CategoryList(
     onEditItem: (ShoppingItem) -> Unit,
     onDeleteCategory: (Category) -> Unit,
     onDeleteItem: (ShoppingItem) -> Unit,
+    onToggleExpand: (Category) -> Unit,
     onToggleItemCompleted: (ShoppingItem) -> Unit
 ) {
     LazyColumn(
@@ -412,6 +416,7 @@ private fun CategoryList(
                 onEditItem = onEditItem,
                 onDeleteCategory = { onDeleteCategory(category) },
                 onDeleteItem = onDeleteItem,
+                onToggleExpand = { onToggleExpand(category) },
                 onToggleItemCompleted = onToggleItemCompleted,
                 swipeResetTrigger = swipeResetTrigger,
                 modifier = Modifier.animateItem(

@@ -13,7 +13,7 @@ import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 
 @Database(
     entities = [Category::class, ShoppingItem::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class ShoppingDatabase : RoomDatabase() {
@@ -26,14 +26,19 @@ abstract class ShoppingDatabase : RoomDatabase() {
         
         @Volatile
         private var INSTANCE: ShoppingDatabase? = null
-        
-        /**
-         * Migration from version 1 to 2: Add is_completed column to shopping_items
-         */
+
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     "ALTER TABLE shopping_items ADD COLUMN is_completed INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE categories ADD COLUMN isExpanded INTEGER NOT NULL DEFAULT 1"
                 )
             }
         }
@@ -50,7 +55,7 @@ abstract class ShoppingDatabase : RoomDatabase() {
                 ShoppingDatabase::class.java,
                 DATABASE_NAME
             )
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .addCallback(SeedDatabaseCallback())
                 .build()
         }
@@ -58,9 +63,9 @@ abstract class ShoppingDatabase : RoomDatabase() {
         private class SeedDatabaseCallback : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                db.execSQL("INSERT INTO categories (name) VALUES ('Beverages')")
-                db.execSQL("INSERT INTO categories (name) VALUES ('Groceries')")
-                db.execSQL("INSERT INTO categories (name) VALUES ('Personal care')")
+                db.execSQL("INSERT INTO categories (name, isExpanded) VALUES ('Beverages', 1)")
+                db.execSQL("INSERT INTO categories (name, isExpanded) VALUES ('Groceries', 1)")
+                db.execSQL("INSERT INTO categories (name, isExpanded) VALUES ('Personal care', 1)")
             }
         }
     }

@@ -118,6 +118,17 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun toggleCategoryExpand(category: Category) {
+        viewModelScope.launch {
+            try {
+                val updateCategory = category.copy(isExpanded = !category.isExpanded)
+                repository.updateCategory(updateCategory)
+            } catch (e: Exception) {
+                _errorMessage.value = "Error updating category state: ${e.message}"
+            }
+        }
+    }
+
     // Shopping item operations
     fun addShoppingItem(name: String, quantity: Int, categoryId: Int) {
         if (name.isBlank()) {
