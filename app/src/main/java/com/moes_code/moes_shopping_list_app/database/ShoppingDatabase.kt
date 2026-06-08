@@ -66,6 +66,9 @@ abstract class ShoppingDatabase : RoomDatabase() {
                 db.execSQL("INSERT INTO categories (name, isExpanded) VALUES ('Beverages', 1)")
                 db.execSQL("INSERT INTO categories (name, isExpanded) VALUES ('Groceries', 1)")
                 db.execSQL("INSERT INTO categories (name, isExpanded) VALUES ('Personal care', 1)")
+
+                db.execSQL("INSERT INTO shopping_items (name, quantity, category_id, is_completed) VALUES ('Water', 6, 1, 0)")
+                db.execSQL("INSERT INTO shopping_items (name, quantity, category_id, is_completed) VALUES ('Cookies', 12, 2, 0)")
             }
         }
     }
