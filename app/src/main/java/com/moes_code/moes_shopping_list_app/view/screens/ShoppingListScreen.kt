@@ -25,7 +25,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -40,7 +39,6 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -66,7 +64,9 @@ import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddItemDialo
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.DeleteConfirmationDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDialog
+import com.moes_code.moes_shopping_list_app.view.components.dialogs.ImportConfirmationDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.SwipeTutorialDialog
+import com.moes_code.moes_shopping_list_app.view.theme.Colors
 import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 import com.moes_code.moes_shopping_list_app.viewmodel.ShoppingViewModel
 
@@ -90,6 +90,7 @@ fun ShoppingListScreen(
     val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var isSuccessSnackbar by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     
     // Derive screen state
@@ -113,6 +114,7 @@ fun ShoppingListScreen(
     // Show error messages as Snackbar
     LaunchedEffect(errorMessage) {
         errorMessage?.let {
+            isSuccessSnackbar = false
             snackbarHostState.showSnackbar(it)
             viewModel.clearErrorMessage()
         }
@@ -121,6 +123,7 @@ fun ShoppingListScreen(
     // Show success messages as Snackbar
     LaunchedEffect(successMessage) {
         successMessage?.let {
+            isSuccessSnackbar = true
             snackbarHostState.showSnackbar(it)
             viewModel.clearSuccessMessage()
         }
@@ -168,8 +171,8 @@ fun ShoppingListScreen(
             SnackbarHost(hostState = snackbarHostState) { data ->
                 Snackbar(
                     snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    containerColor = if (isSuccessSnackbar) Colors.moe_blue else MaterialTheme.colorScheme.errorContainer,
+                    contentColor = if (isSuccessSnackbar) Colors.moe_white else MaterialTheme.colorScheme.onErrorContainer,
                     shape = MaterialTheme.shapes.medium
                 )
             }
@@ -363,25 +366,9 @@ fun ShoppingListScreen(
 
     // Import confirmation dialog
     if (showImportConfirmDialog) {
-        AlertDialog(
-            onDismissRequest = { showImportConfirmDialog = false },
-            title = { Text(stringResource(R.string.dialog_title_import)) },
-            text = { Text(stringResource(R.string.dialog_message_import_confirm)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showImportConfirmDialog = false
-                        importLauncher.launch(arrayOf("application/json"))
-                    }
-                ) {
-                    Text(stringResource(R.string.button_delete))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showImportConfirmDialog = false }) {
-                    Text(stringResource(R.string.button_cancel))
-                }
-            }
+        ImportConfirmationDialog(
+            onDismiss = { showImportConfirmDialog = false },
+            onConfirm = { importLauncher.launch(arrayOf("application/json")) }
         )
     }
 }
