@@ -1,5 +1,7 @@
 package com.moes_code.moes_shopping_list_app.view.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -22,10 +24,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,6 +40,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -79,6 +87,8 @@ fun ShoppingListScreen(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val showSwipeTutorial by viewModel.showSwipeTutorial.collectAsStateWithLifecycle()
 
+    val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     
@@ -108,6 +118,14 @@ fun ShoppingListScreen(
         }
     }
 
+    // Show success messages as Snackbar
+    LaunchedEffect(successMessage) {
+        successMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearSuccessMessage()
+        }
+    }
+
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var showAddItemDialog by remember { mutableStateOf(false) }
     var showEditCategoryDialog by remember { mutableStateOf(false) }
@@ -123,10 +141,28 @@ fun ShoppingListScreen(
     // Trigger to reset swipe states when dialogs close
     var swipeResetTrigger by remember { mutableIntStateOf(0) }
 
+    var showImportConfirmDialog by remember { mutableStateOf(false) }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        uri?.let { viewModel.exportDatabase(it) }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let { viewModel.importDatabase(it) }
+    }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            ShoppingListTopBar(scrollBehavior = scrollBehavior)
+            ShoppingListTopBar(
+                scrollBehavior = scrollBehavior,
+                onExport = { exportLauncher.launch("shopping_list_backup.json") },
+                onImport = { showImportConfirmDialog = true }
+            )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
@@ -324,13 +360,41 @@ fun ShoppingListScreen(
             onDismiss = { viewModel.dismissSwipeTutorial() }
         )
     }
+
+    // Import confirmation dialog
+    if (showImportConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showImportConfirmDialog = false },
+            title = { Text(stringResource(R.string.dialog_title_import)) },
+            text = { Text(stringResource(R.string.dialog_message_import_confirm)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showImportConfirmDialog = false
+                        importLauncher.launch(arrayOf("application/json"))
+                    }
+                ) {
+                    Text(stringResource(R.string.button_delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showImportConfirmDialog = false }) {
+                    Text(stringResource(R.string.button_cancel))
+                }
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShoppingListTopBar(
-    scrollBehavior: TopAppBarScrollBehavior
+    scrollBehavior: TopAppBarScrollBehavior,
+    onExport: () -> Unit,
+    onImport: () -> Unit
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     LargeTopAppBar(
         title = {
             Text(
@@ -339,6 +403,35 @@ private fun ShoppingListTopBar(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
+        },
+        actions = {
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "More options"
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_export)) },
+                        onClick = {
+                            showMenu = false
+                            onExport()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.action_import)) },
+                        onClick = {
+                            showMenu = false
+                            onImport()
+                        }
+                    )
+                }
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,

@@ -57,4 +57,14 @@
     <string name="tutorial_swipe_edit">Swipe right to edit</string>
     <string name="tutorial_swipe_delete">Swipe left to delete</string>
     <string name="tutorial_swipe_got_it">Got it!</string>
+
+    <!-- Backup -->
+    <string name="action_export">Export</string>
+    <string name="action_import">Import</string>
+    <string name="dialog_title_import">Import Backup</string>
+    <string name="dialog_message_import_confirm">This will replace all current data with the backup. Are you sure?</string>
+    <string name="message_export_success">Backup exported successfully</string>
+    <string name="message_import_success">Backup imported successfully</string>
+    <string name="message_export_error">Error exporting backup</string>
+    <string name="message_import_error">Error importing backup</string>
 </resources>

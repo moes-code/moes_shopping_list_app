@@ -2,12 +2,14 @@ package com.moes_code.moes_shopping_list_app.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.repository.ShoppingRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
@@ -205,8 +208,61 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    // Success message
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
+
+    // Backup operations
+
+    fun exportDatabase(uri: Uri) {
+        viewModelScope.launch {
+            try {
+                val json = withContext(Dispatchers.IO) {
+                    repository.exportToJson()
+                }
+                val context = getApplication<Application>()
+                withContext(Dispatchers.IO) {
+                    context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(json.toByteArray(Charsets.UTF_8))
+                    }
+                }
+                _successMessage.value = "Backup exported successfully"
+            } catch (e: Exception) {
+                _errorMessage.value = "Error exporting backup: ${e.message}"
+            }
+        }
+    }
+
+    fun importDatabase(uri: Uri) {
+        viewModelScope.launch {
+            try {
+                val json = withContext(Dispatchers.IO) {
+                    val context = getApplication<Application>()
+                    context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                        inputStream.bufferedReader(Charsets.UTF_8).readText()
+                    } ?: throw Exception("Could not read file")
+                }
+                val result = repository.importFromJson(json)
+                result.fold(
+                    onSuccess = {
+                        _successMessage.value = "Backup imported successfully"
+                    },
+                    onFailure = { e ->
+                        _errorMessage.value = "Error importing backup: ${e.message}"
+                    }
+                )
+            } catch (e: Exception) {
+                _errorMessage.value = "Error importing backup: ${e.message}"
+            }
+        }
+    }
+
     // Helper to clear error state
     fun clearErrorMessage() {
         _errorMessage.value = null
+    }
+
+    fun clearSuccessMessage() {
+        _successMessage.value = null
     }
 }

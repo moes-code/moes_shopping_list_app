@@ -13,16 +13,22 @@ interface CategoryDao {
     
     @Query("SELECT * FROM categories ORDER BY name ASC")
     fun getAll(): Flow<List<Category>>
-    
+
+    @Query("SELECT * FROM categories ORDER BY name ASC")
+    fun getAllSync(): List<Category>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(category: Category): Long
-    
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertSync(category: Category): Long
-    
+
     @Update
     suspend fun update(category: Category): Int
-    
+
     @Query("DELETE FROM categories WHERE id = :id")
     suspend fun deleteById(id: Int): Int
+
+    @Query("DELETE FROM categories")
+    suspend fun deleteAll(): Int
 }

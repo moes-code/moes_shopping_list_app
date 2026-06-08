@@ -13,13 +13,19 @@ interface ShoppingItemDao {
     
     @Query("SELECT * FROM shopping_items WHERE category_id = :categoryId ORDER BY name ASC")
     fun getByCategory(categoryId: Int): Flow<List<ShoppingItem>>
-    
+
+    @Query("SELECT * FROM shopping_items ORDER BY name ASC")
+    fun getAllSync(): List<ShoppingItem>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: ShoppingItem): Long
-    
+
     @Update
     suspend fun update(item: ShoppingItem): Int
-    
+
     @Query("DELETE FROM shopping_items WHERE id = :id")
     suspend fun deleteById(id: Int): Int
+
+    @Query("DELETE FROM shopping_items")
+    suspend fun deleteAll(): Int
 }
