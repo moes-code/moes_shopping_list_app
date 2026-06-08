@@ -4,12 +4,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
-/**
- * Material 3 Dark Theme for Shopping List App
- * 
- * Uses the custom color palette with proper Material 3 color roles.
- * Optimized for dark mode with subtle surface elevation differences.
- */
 private val DarkColorScheme = darkColorScheme(
     // Primary colors
     primary = Colors.moe_blue,
@@ -17,13 +11,13 @@ private val DarkColorScheme = darkColorScheme(
     primaryContainer = Colors.moe_blue_dim,
     onPrimaryContainer = Colors.moe_blue_bright,
     
-    // Secondary colors (Yellow for actions)
+    // Secondary colors
     secondary = Colors.moe_yellow,
     onSecondary = Colors.moe_black,
     secondaryContainer = Colors.moe_yellow_dim,
     onSecondaryContainer = Colors.moe_yellow,
     
-    // Tertiary colors (Green for success)
+    // Tertiary colors
     tertiary = Colors.moe_green,
     onTertiary = Colors.moe_white,
     tertiaryContainer = Colors.moe_green_dim,

@@ -19,13 +19,15 @@ plugins {
 configure<ApplicationExtension> {
     namespace = "com.moes_code.moes_shopping_list_app"
     compileSdk = 36
+    ndkVersion = "29.0.14206865"
 
     defaultConfig {
         applicationId = "com.moes_code.moes_shopping_list_app"
         minSdk = 29
+        //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 5
-        versionName = "2.7"
+        versionCode = 6
+        versionName = "2.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,6 +46,7 @@ configure<ApplicationExtension> {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

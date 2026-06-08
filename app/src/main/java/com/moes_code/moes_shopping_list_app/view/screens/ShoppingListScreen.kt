@@ -61,9 +61,6 @@ import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDial
 import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 import com.moes_code.moes_shopping_list_app.viewmodel.ShoppingViewModel
 
-/**
- * Sealed class representing the different UI states
- */
 private sealed class ScreenState {
     data object Loading : ScreenState()
     data object Empty : ScreenState()

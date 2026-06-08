@@ -4,24 +4,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
 
-/**
- * Material 3 Shapes for Shopping List App
- * 
- * Consistent rounded corners throughout the app.
- */
 val AppShapes = Shapes(
-    // Extra Small - Chips, small buttons
+    // Extra Small
     extraSmall = RoundedCornerShape(4.dp),
     
-    // Small - Text fields, small cards
+    // Small
     small = RoundedCornerShape(8.dp),
     
-    // Medium - Cards, dialogs
+    // Medium
     medium = RoundedCornerShape(16.dp),
     
-    // Large - Large cards, bottom sheets
+    // Large
     large = RoundedCornerShape(24.dp),
     
-    // Extra Large - Full screen dialogs
+    // Extra Large
     extraLarge = RoundedCornerShape(32.dp)
 )

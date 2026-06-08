@@ -23,7 +23,7 @@ class ShoppingRepository(context: Context) {
         return try {
             categoryDao.insert(category)
         } catch (_: SQLiteConstraintException) {
-            -1L // Duplicate name
+            -1L
         }
     }
     
@@ -31,7 +31,7 @@ class ShoppingRepository(context: Context) {
         return try {
             categoryDao.update(category)
         } catch (_: SQLiteConstraintException) {
-            -1 // Duplicate name
+            -1
         }
     }
     

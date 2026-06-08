@@ -26,41 +26,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlin.math.roundToInt
 
-/**
- * Represents the current swipe state of a SwipeableItem
- */
 enum class SwipeState {
-    /** Item is at rest position */
     Settled,
-    /** Item has been swiped to the left (typically delete action) */
     SwipedLeft,
-    /** Item has been swiped to the right (typically edit action) */
     SwipedRight
 }
 
-/**
- * Represents the current swipe direction while dragging
- */
 enum class SwipeDirection {
     None,
     Left,
     Right
 }
 
-/**
- * A composable that provides swipe-to-action functionality using the modern
- * AnchoredDraggable API instead of the deprecated SwipeToDismissBox.
- *
- * @param onSwipeLeft Callback triggered when item is fully swiped left
- * @param onSwipeRight Callback triggered when item is fully swiped right
- * @param modifier Modifier to be applied to the container
- * @param swipeThreshold The fraction of the swipe distance that must be reached to trigger action (0.0-1.0)
- * @param enableSwipeLeft Whether left swipe is enabled
- * @param enableSwipeRight Whether right swipe is enabled
- * @param resetTrigger When this value changes, the swipe state will be reset to Settled. Useful for resetting after dialogs close.
- * @param backgroundContent Content displayed behind the item while swiping, receives current direction
- * @param content The main content of the swipeable item
- */
 @Composable
 fun SwipeableItem(
     onSwipeLeft: () -> Unit,
@@ -75,7 +52,7 @@ fun SwipeableItem(
 ) {
     val density = LocalDensity.current
     
-    // Swipe distance in pixels (using a fixed distance for consistent feel)
+    // Swipe distance in pixels
     val swipeDistancePx = with(density) { Dimensions.swipeDistance.toPx() }
     val swipeThresholdPx = with(density) { Dimensions.swipeDirectionThreshold.toPx() }
     
@@ -84,7 +61,7 @@ fun SwipeableItem(
         AnchoredDraggableState(initialValue = SwipeState.Settled)
     }
     
-    // Reset swipe state when resetTrigger changes (e.g., when dialogs close)
+    // Reset swipe state when resetTrigger changes
     LaunchedEffect(resetTrigger) {
         if (resetTrigger != null && state.currentValue != SwipeState.Settled) {
             state.animateTo(SwipeState.Settled)
@@ -106,7 +83,7 @@ fun SwipeableItem(
         )
     }
     
-    // Handle swipe completion - trigger action and reset
+    // Handle swipe completion
     LaunchedEffect(state) {
         snapshotFlow { state.currentValue }
             .filter { it != SwipeState.Settled }
@@ -120,12 +97,12 @@ fun SwipeableItem(
                         onSwipeRight()
                         state.animateTo(SwipeState.Settled)
                     }
-                    SwipeState.Settled -> { /* Should not happen due to filter */ }
+                    SwipeState.Settled -> { }
                 }
             }
     }
     
-    // Derive current swipe direction from offset (using safe access with NaN check)
+    // Derive current swipe direction from offset
     val currentDirection by remember {
         derivedStateOf {
             val offset = state.offset
@@ -139,13 +116,12 @@ fun SwipeableItem(
     }
     
     Box(modifier = modifier) {
-        // Background layer (revealed when swiping) - matches the size of foreground
-        // Uses matchParentSize() to match the foreground content's size
+        // Background layer
         Box(modifier = Modifier.matchParentSize()) {
             backgroundContent(currentDirection)
         }
         
-        // Foreground content (draggable) - determines the size of the container
+        // Foreground content
         Box(
             modifier = Modifier
                 .fillMaxWidth()

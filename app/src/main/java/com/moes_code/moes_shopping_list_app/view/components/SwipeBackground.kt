@@ -19,16 +19,6 @@ import androidx.compose.ui.unit.Dp
 import com.moes_code.moes_shopping_list_app.view.theme.Colors
 import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 
-/**
- * Reusable swipe background for swipeable items.
- * Shows edit icon when swiping right, delete icon when swiping left.
- *
- * @param direction Current swipe direction
- * @param modifier Modifier to be applied
- * @param shape Shape of the background (should match the foreground item)
- * @param horizontalPadding Padding for the icon from the edge
- * @param iconSize Size of the action icon
- */
 @Composable
 fun SwipeBackground(
     direction: SwipeDirection,

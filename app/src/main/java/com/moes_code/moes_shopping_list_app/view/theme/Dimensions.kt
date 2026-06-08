@@ -2,9 +2,6 @@ package com.moes_code.moes_shopping_list_app.view.theme
 
 import androidx.compose.ui.unit.dp
 
-/**
- * Centralized dimension constants for consistent sizing across the app.
- */
 object Dimensions {
     // === ITEM ROW ===
     val itemButtonSize = 42.dp

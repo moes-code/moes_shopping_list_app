@@ -34,10 +34,6 @@ import com.moes_code.moes_shopping_list_app.R
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 
-/**
- * A row displaying a shopping item with checkbox, name, quantity, and action buttons.
- * Supports swipe actions for edit/delete.
- */
 @Composable
 fun ShoppingItemRow(
     item: ShoppingItem,
@@ -48,7 +44,7 @@ fun ShoppingItemRow(
 ) {
     val colorScheme = MaterialTheme.colorScheme
     
-    // Animate border color based on completed state (dimmed when completed)
+    // Animate border color based on completed state
     val borderColor by animateColorAsState(
         targetValue = if (item.isCompleted) {
             colorScheme.primary.copy(alpha = 0.4f)

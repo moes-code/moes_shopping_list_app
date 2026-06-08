@@ -6,13 +6,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-/**
- * Material 3 Typography for Shopping List App
- * 
- * Clean, modern typography optimized for readability.
- */
 val AppTypography = Typography(
-    // Display styles - Large headers
+    // Display styles
     displayLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
@@ -35,7 +30,7 @@ val AppTypography = Typography(
         letterSpacing = 0.sp
     ),
     
-    // Headline styles - Section headers
+    // Headline styles
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
@@ -58,7 +53,7 @@ val AppTypography = Typography(
         letterSpacing = 0.sp
     ),
     
-    // Title styles - Card titles, dialog titles
+    // Title styles
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
@@ -81,7 +76,7 @@ val AppTypography = Typography(
         letterSpacing = 0.1.sp
     ),
     
-    // Body styles - Main content
+    // Body styles
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
@@ -104,7 +99,7 @@ val AppTypography = Typography(
         letterSpacing = 0.4.sp
     ),
     
-    // Label styles - Buttons, chips, form labels
+    // Label styles
     labelLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Medium,

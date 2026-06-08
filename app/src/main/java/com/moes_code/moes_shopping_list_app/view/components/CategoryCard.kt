@@ -46,10 +46,6 @@ import com.moes_code.moes_shopping_list_app.model.Category
 import com.moes_code.moes_shopping_list_app.model.ShoppingItem
 import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 
-/**
- * A card displaying a category with its items.
- * Supports swipe actions for edit/delete and expandable/collapsible items list.
- */
 @Composable
 fun CategoryCard(
     category: Category,
@@ -64,7 +60,7 @@ fun CategoryCard(
     modifier: Modifier = Modifier,
     swipeResetTrigger: Any? = null
 ) {
-    // Animate rotation for expand icon (0° when expanded, 180° when collapsed)
+    // Animate rotation for expand icon
     val expandIconRotation by animateFloatAsState(
         targetValue = if (category.isExpanded) 0f else 180f,
         animationSpec = spring(
@@ -121,7 +117,7 @@ fun CategoryCard(
                     color = MaterialTheme.colorScheme.outline
                 )
 
-                // Items List (expandable)
+                // Items List
                 AnimatedVisibility(
                     visible = category.isExpanded,
                     enter = expandVertically(
@@ -145,9 +141,6 @@ fun CategoryCard(
     }
 }
 
-/**
- * Header row for the category card containing expand button, title, and action buttons.
- */
 @Composable
 private fun CategoryHeader(
     categoryName: String,
@@ -170,7 +163,7 @@ private fun CategoryHeader(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f)
         ) {
-            // Expand/Collapse button (transparent)
+            // Expand/Collapse button
             IconButton(
                 onClick = onExpandClick,
                 modifier = Modifier.size(Dimensions.expandButtonSize)
@@ -218,9 +211,6 @@ private fun CategoryHeader(
     }
 }
 
-/**
- * List of shopping items within a category.
- */
 @Composable
 private fun CategoryItemsList(
     items: List<ShoppingItem>,
@@ -249,9 +239,6 @@ private fun CategoryItemsList(
     }
 }
 
-/**
- * Placeholder shown when a category has no items.
- */
 @Composable
 private fun EmptyItemsPlaceholder() {
     Box(

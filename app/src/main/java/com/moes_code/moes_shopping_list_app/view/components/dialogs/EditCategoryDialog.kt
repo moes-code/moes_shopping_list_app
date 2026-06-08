@@ -101,7 +101,7 @@ fun EditCategoryDialog(
                     )
                 )
                 
-                // Helper text when no changes made
+                // Helper text
                 AnimatedVisibility(
                     visible = !hasChanges,
                     enter = fadeIn(),

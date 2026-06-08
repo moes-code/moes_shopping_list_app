@@ -24,11 +24,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private val repository = ShoppingRepository(application)
 
-    // Loading indicator - true until first data emission
+    // Loading indicator
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // Reactive list of categories - automatically updates when database changes
+    // Reactive list of categories
     val categories: StateFlow<List<Category>> = repository.getAllCategories()
         .stateIn(
             scope = viewModelScope,
@@ -43,7 +43,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    // Shopping items grouped by category - automatically updates when database changes
+    // Shopping items grouped by category
     val shoppingItemsByCategory: StateFlow<Map<Category, List<ShoppingItem>>> = 
         categories.flatMapLatest { categoryList ->
             if (categoryList.isEmpty()) {
@@ -65,7 +65,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             initialValue = emptyMap()
         )
 
-    // Optional error message for UI display
+    // Optional error message
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
@@ -82,7 +82,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 if (result == -1L) {
                     _errorMessage.value = "Category '${name.trim()}' already exists"
                 }
-                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error adding category: ${e.message}"
             }
@@ -100,7 +99,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 if (result == -1) {
                     _errorMessage.value = "Category '${category.name.trim()}' already exists"
                 }
-                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error updating category: ${e.message}"
             }
@@ -111,7 +109,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 repository.deleteCategory(categoryId)
-                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error deleting category: ${e.message}"
             }
@@ -148,7 +145,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     isCompleted = false
                 )
                 repository.addShoppingItem(item)
-                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error adding item: ${e.message}"
             }
@@ -167,7 +163,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 repository.updateShoppingItem(item)
-                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error updating item: ${e.message}"
             }
@@ -178,22 +173,17 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 repository.deleteShoppingItem(itemId)
-                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error deleting item: ${e.message}"
             }
         }
     }
 
-    /**
-     * Toggle the completed status of a shopping item
-     */
     fun toggleItemCompleted(item: ShoppingItem) {
         viewModelScope.launch {
             try {
                 val updatedItem = item.copy(isCompleted = !item.isCompleted)
                 repository.updateShoppingItem(updatedItem)
-                // No need to reload - Room Flow updates automatically
             } catch (e: Exception) {
                 _errorMessage.value = "Error updating item: ${e.message}"
             }

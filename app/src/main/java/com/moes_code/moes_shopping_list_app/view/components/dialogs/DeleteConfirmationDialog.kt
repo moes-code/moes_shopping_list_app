@@ -88,7 +88,7 @@ fun DeleteConfirmationDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    // Cancel Button (Keep/Safe action)
+                    // Cancel Button
                     TextButton(
                         onClick = onDismiss,
                         colors = ButtonDefaults.textButtonColors(
@@ -106,7 +106,7 @@ fun DeleteConfirmationDialog(
                     
                     Spacer(modifier = Modifier.width(Dimensions.dialogButtonSpacing))
                     
-                    // Delete Button (Destructive action)
+                    // Delete Button
                     FilledTonalButton(
                         onClick = {
                             onConfirm()

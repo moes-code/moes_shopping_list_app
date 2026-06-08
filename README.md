@@ -31,7 +31,6 @@ Organizing shopping by store sections
 Planning multiple shopping trips
 Anyone who values privacy and offline functionality
 
-
 Open Source Commitment
 
 This app is completely open source and available under the MIT License. You can review the code, contribute, or modify it to suit your needs. We believe in transparency and user privacy.
