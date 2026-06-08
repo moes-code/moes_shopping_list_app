@@ -1,6 +1,8 @@
 package com.moes_code.moes_shopping_list_app.viewmodel
 
 import android.app.Application
+import android.content.Context
+import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.moes_code.moes_shopping_list_app.model.Category
@@ -11,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -38,7 +39,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     init {
         viewModelScope.launch {
-            categories.filter { it.isNotEmpty() }.first()
+            categories.first { it.isNotEmpty() }
             _isLoading.value = false
         }
     }
@@ -64,6 +65,20 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyMap()
         )
+
+    // Swipe tutorial state
+    private val sharedPreferences =
+        application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+    private val _showSwipeTutorial = MutableStateFlow(
+        !sharedPreferences.getBoolean("swipe_tutorial_shown", false)
+    )
+    val showSwipeTutorial: StateFlow<Boolean> = _showSwipeTutorial.asStateFlow()
+
+    fun dismissSwipeTutorial() {
+        sharedPreferences.edit { putBoolean("swipe_tutorial_shown", true) }
+        _showSwipeTutorial.value = false
+    }
 
     // Optional error message
     private val _errorMessage = MutableStateFlow<String?>(null)

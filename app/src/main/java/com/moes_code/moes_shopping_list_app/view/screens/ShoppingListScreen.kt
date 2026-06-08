@@ -58,6 +58,7 @@ import com.moes_code.moes_shopping_list_app.view.components.dialogs.AddItemDialo
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.DeleteConfirmationDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditCategoryDialog
 import com.moes_code.moes_shopping_list_app.view.components.dialogs.EditItemDialog
+import com.moes_code.moes_shopping_list_app.view.components.dialogs.SwipeTutorialDialog
 import com.moes_code.moes_shopping_list_app.view.theme.Dimensions
 import com.moes_code.moes_shopping_list_app.viewmodel.ShoppingViewModel
 
@@ -76,6 +77,7 @@ fun ShoppingListScreen(
     val shoppingItemsByCategory by viewModel.shoppingItemsByCategory.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val showSwipeTutorial by viewModel.showSwipeTutorial.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -313,6 +315,13 @@ fun ShoppingListScreen(
                 viewModel.deleteShoppingItem(selectedItemToDelete!!.id)
                 swipeResetTrigger++
             }
+        )
+    }
+
+    // Swipe tutorial dialog
+    if (showSwipeTutorial) {
+        SwipeTutorialDialog(
+            onDismiss = { viewModel.dismissSwipeTutorial() }
         )
     }
 }

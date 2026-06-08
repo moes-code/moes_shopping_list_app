@@ -18,7 +18,7 @@ plugins {
 
 configure<ApplicationExtension> {
     namespace = "com.moes_code.moes_shopping_list_app"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = "29.0.14206865"
 
     defaultConfig {

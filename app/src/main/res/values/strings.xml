@@ -51,4 +51,10 @@
     <!-- Accessibility -->
     <string name="content_description_expand">Expand</string>
     <string name="content_description_collapse">Collapse</string>
+    
+    <!-- Swipe Tutorial -->
+    <string name="tutorial_swipe_title">Swipe Gestures</string>
+    <string name="tutorial_swipe_edit">Swipe right to edit</string>
+    <string name="tutorial_swipe_delete">Swipe left to delete</string>
+    <string name="tutorial_swipe_got_it">Got it!</string>
 </resources>
