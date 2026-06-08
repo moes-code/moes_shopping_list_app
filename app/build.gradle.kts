@@ -26,8 +26,8 @@ configure<ApplicationExtension> {
         minSdk = 29
         //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 6
-        versionName = "2.8"
+        versionCode = 7
+        versionName = "3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
