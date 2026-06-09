@@ -3,6 +3,7 @@ package com.moes_code.moes_shopping_list_app.repository
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.moes_code.moes_shopping_list_app.database.ShoppingDatabase
 import com.moes_code.moes_shopping_list_app.database.dao.CategoryDao
 import com.moes_code.moes_shopping_list_app.database.dao.ShoppingItemDao
@@ -12,8 +13,11 @@ import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 
 data class BackupData(
+    @SerializedName("version")
     val version: Int = 1,
+    @SerializedName("categories")
     val categories: List<Category>,
+    @SerializedName("shoppingItems")
     val shoppingItems: List<ShoppingItem>
 )
 

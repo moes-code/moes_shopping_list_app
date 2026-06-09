@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
 @Entity(
     tableName = "shopping_items",
@@ -20,11 +21,16 @@ import androidx.room.PrimaryKey
 )
 data class ShoppingItem(
     @PrimaryKey(autoGenerate = true)
+    @SerializedName("id")
     val id: Int = 0,
+    @SerializedName("name")
     val name: String,
+    @SerializedName("quantity")
     val quantity: Int = 1,
     @ColumnInfo(name = "category_id")
+    @SerializedName("categoryId")
     val categoryId: Int = 1,
     @ColumnInfo(name = "is_completed", defaultValue = "0")
+    @SerializedName("isCompleted")
     val isCompleted: Boolean = false
 )

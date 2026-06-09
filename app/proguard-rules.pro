@@ -22,3 +22,6 @@
 
 # Keep data model classes
 -keep class com.moes_code.moes_shopping_list_app.model.** { *; }
+
+# Keep backup data class for Gson deserialization
+-keep class com.moes_code.moes_shopping_list_app.repository.BackupData { *; }
