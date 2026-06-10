@@ -168,7 +168,8 @@ fun ShoppingListScreen(
             ShoppingListTopBar(
                 scrollBehavior = scrollBehavior,
                 onExport = { exportLauncher.launch("shopping_list_backup.json") },
-                onImport = { showImportConfirmDialog = true }
+                onImport = { showImportConfirmDialog = true },
+                onShowTutorial = { viewModel.showTutorial() }
             )
         },
         snackbarHost = {
@@ -382,7 +383,8 @@ fun ShoppingListScreen(
 private fun ShoppingListTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
     onExport: () -> Unit,
-    onImport: () -> Unit
+    onImport: () -> Unit,
+    onShowTutorial: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -445,6 +447,20 @@ private fun ShoppingListTopBar(
                         onClick = {
                             showMenu = false
                             onImport()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(stringResource(R.string.action_tutorial), color = MaterialTheme.colorScheme.onBackground)
+                            }
+                        },
+                        onClick = {
+                            showMenu = false
+                            onShowTutorial()
                         }
                     )
                 }

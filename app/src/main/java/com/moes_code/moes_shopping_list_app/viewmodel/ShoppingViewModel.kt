@@ -83,6 +83,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _showSwipeTutorial.value = false
     }
 
+    fun showTutorial() {
+        _showSwipeTutorial.value = true
+    }
+
     // Optional error message
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()

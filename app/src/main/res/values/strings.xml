@@ -59,6 +59,7 @@
     <string name="tutorial_swipe_got_it">Got it!</string>
 
     <!-- Backup -->
+    <string name="action_tutorial">Tutorial</string>
     <string name="action_export">Export</string>
     <string name="action_import">Import</string>
     <string name="dialog_title_import">Import Backup</string>
